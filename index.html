@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="BraidMap — Find talented BIPOC hairstylists across British Columbia. Discover knotless braids, locs, silk press, and more in BC.">
+<title>BraidMap — Find BIPOC Hair Stylists in BC</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0A0A0A;
+    --white: #FAFAFA;
+    --grey-100: #F2F2F2;
+    --grey-200: #E0E0E0;
+    --grey-400: #A0A0A0;
+    --grey-600: #555555;
+    --grey-800: #222222;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: 'Manrope', sans-serif;
+    overflow-x: hidden;
+    
+  }
+
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--black);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 34px; height: 34px;
+    border: 1px solid rgba(10,10,10,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(250,250,250,0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--black);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 14px;
+    font-style: italic;
+    font-family: 'Instrument Serif', serif;
+  }
+  .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--grey-600); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--black); }
+  .nav-cta {
+    background: var(--black) !important;
+    color: var(--white) !important;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    transition: opacity 0.15s !important;
+  }
+  .nav-cta:hover { opacity: 0.8 !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    padding-top: 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 56px 80px 80px;
+    border-right: 1px solid var(--grey-200);
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--grey-400);
+    margin-bottom: 28px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .hero-h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 78px;
+    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: -3px;
+    color: var(--black);
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s 0.08s ease both;
+  }
+  .hero-h1 em { font-style: italic; color: var(--grey-400); }
+  .hero-sub {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--grey-600);
+    max-width: 380px;
+    font-weight: 300;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s 0.16s ease both;
+  }
+  .search-bar {
+    display: flex;
+    border: 1.5px solid var(--black);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 460px;
+    animation: fadeUp 0.5s 0.24s ease both;
+  }
+  .search-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    border-right: 1px solid var(--grey-200);
+    background: var(--white);
+  }
+  .search-field:last-of-type { border-right: none; }
+  .search-icon { color: var(--grey-400); flex-shrink: 0; }
+  .search-field input, .search-field select {
+    border: none; outline: none;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; color: var(--black);
+    background: transparent; width: 100%;
+  }
+  .search-field input::placeholder { color: var(--grey-400); }
+  .search-btn {
+    background: var(--black); color: var(--white);
+    border: none; padding: 13px 22px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 500;
+     transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .search-btn:hover { opacity: 0.85; }
+
+  .hero-stats {
+    display: flex;
+    border: 1px solid var(--grey-200);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 460px;
+    margin-top: 16px;
+    animation: fadeUp 0.5s 0.32s ease both;
+  }
+  .stat { flex: 1; padding: 16px 20px; border-right: 1px solid var(--grey-200); }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px; color: var(--black);
+    letter-spacing: -1px; line-height: 1; display: block;
+  }
+  .stat-label { font-size: 11px; color: var(--grey-400); margin-top: 2px; display: block; }
+
+  /* Hero right */
+  .hero-right {
+    background: var(--black);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 60px 56px;
+    position: relative; overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .hero-right-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 24px; position: relative;
+  }
+  .stylist-cards {
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stylist-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 18px 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+     transition: all 0.2s;
+    background: rgba(255,255,255,0.03);
+  }
+  .stylist-card:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.18);
+    transform: translateX(4px);
+  }
+  .s-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px; font-style: italic; color: white; flex-shrink: 0;
+  }
+  .s-info { flex: 1; }
+  .s-name { font-size: 14px; font-weight: 500; color: white; margin-bottom: 3px; }
+  .s-loc {
+    font-size: 10px; color: rgba(255,255,255,0.3);
+    font-family: 'DM Mono', monospace; margin-bottom: 10px;
+  }
+  .s-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .s-tag {
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4);
+    border-radius: 4px; padding: 2px 8px;
+    font-size: 10px; font-family: 'DM Mono', monospace;
+  }
+  .s-count {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px; color: rgba(255,255,255,0.15);
+    font-style: italic; flex-shrink: 0; line-height: 1; padding-top: 4px;
+  }
+  .hero-map-hint {
+    position: absolute; bottom: 28px; right: 28px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 8px 14px;
+     transition: all 0.2s;
+  }
+  .hero-map-hint:hover { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.2); }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    border-top: 1px solid var(--grey-200);
+    border-bottom: 1px solid var(--grey-200);
+    overflow: hidden; padding: 14px 0;
+    background: var(--grey-100);
+  }
+  .marquee {
+    display: flex; gap: 0;
+    animation: marquee 35s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    display: flex; align-items: center; gap: 20px;
+    padding: 0 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--grey-400);
+  }
+  .marquee-dot { width: 3px; height: 3px; background: var(--grey-400); border-radius: 50%; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* TAGS SECTION */
+  .tags-section { padding: 100px 80px; border-bottom: 1px solid var(--grey-200); }
+  .section-header-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; margin-bottom: 52px; align-items: end;
+  }
+  .eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--grey-400); margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px; font-weight: 400;
+    letter-spacing: -2px; line-height: 1.05;
+    color: var(--black);
+  }
+  .section-title em { font-style: italic; color: var(--grey-400); }
+  .section-desc {
+    font-size: 14px; line-height: 1.8;
+    color: var(--grey-600); font-weight: 300;
+    align-self: end;
+  }
+  .tags-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag-pill {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 18px; border-radius: 6px;
+    border: 1px solid var(--grey-200); background: var(--white);
+    font-size: 13px; color: var(--grey-600);
+     transition: all 0.15s;
+  }
+  .tag-pill:hover { border-color: var(--black); color: var(--black); background: var(--grey-100); }
+  .tag-pill.active { background: var(--black); border-color: var(--black); color: var(--white); }
+  .tag-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--grey-400); transition: color 0.15s; }
+  .tag-pill:hover .tag-num { color: var(--grey-600); }
+  .tag-pill.active .tag-num { color: rgba(255,255,255,0.35); }
+
+  /* HOW IT WORKS */
+  .how-section { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--grey-200); }
+  .step {
+    padding: 72px 48px; border-right: 1px solid var(--grey-200);
+    transition: background 0.2s; 
+  }
+  .step:last-child { border-right: none; }
+  .step:hover { background: var(--grey-100); }
+  .step-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 72px; color: var(--grey-200);
+    line-height: 1; margin-bottom: 28px; letter-spacing: -3px;
+  }
+  .step-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px; color: var(--black);
+    margin-bottom: 12px; letter-spacing: -0.5px;
+  }
+  .step-desc { font-size: 13px; color: var(--grey-600); line-height: 1.8; font-weight: 300; max-width: 240px; }
+
+  /* FEATURED */
+  .featured-section { padding: 100px 80px; border-top: 1px solid var(--grey-200); }
+  .featured-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 44px; }
+  .view-all {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--grey-400); text-decoration: none;
+    padding-bottom: 2px; border-bottom: 1px solid var(--grey-200);
+    transition: all 0.15s;
+  }
+  .view-all:hover { color: var(--black); border-color: var(--black); }
+  .stylist-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--grey-200); border-radius: 10px; overflow: hidden;
+  }
+  .stylist-full-card {
+    padding: 32px; border-right: 1px solid var(--grey-200);
+     transition: background 0.2s;
+  }
+  .stylist-full-card:last-child { border-right: none; }
+  .stylist-full-card:hover { background: var(--grey-100); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+  .card-avatar {
+    width: 50px; height: 50px; background: var(--black);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px; font-style: italic; color: white;
+  }
+  .card-city {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--grey-400); border: 1px solid var(--grey-200);
+    padding: 4px 10px; border-radius: 4px;
+  }
+  .card-name {
+    font-family: 'Instrument Serif', serif; font-size: 20px;
+    color: var(--black); margin-bottom: 3px; letter-spacing: -0.5px;
+  }
+  .card-handle { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--grey-400); margin-bottom: 16px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 18px; }
+  .card-tag {
+    background: var(--grey-100); color: var(--grey-600);
+    border: 1px solid var(--grey-200); border-radius: 4px;
+    padding: 3px 10px; font-size: 11px; font-family: 'DM Mono', monospace;
+  }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--grey-200); }
+  .card-service-count {
+    font-family: 'Instrument Serif', serif; font-size: 32px;
+    color: var(--grey-200); letter-spacing: -1px; line-height: 1;
+  }
+  .card-deposit { font-size: 11px; color: var(--grey-400); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; }
+  .deposit-dot { width: 5px; height: 5px; background: var(--black); border-radius: 50%; }
+
+  /* CTA */
+  .cta-section {
+    background: var(--black); padding: 100px 80px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .cta-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 54px; font-weight: 400;
+    letter-spacing: -2px; line-height: 1.05;
+    color: white; position: relative;
+  }
+  .cta-title em { font-style: italic; color: rgba(255,255,255,0.3); }
+  .cta-right { position: relative; }
+  .cta-desc { font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.8; font-weight: 300; margin-bottom: 32px; }
+  .cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: white; color: var(--black);
+    padding: 13px 26px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+     transition: opacity 0.15s;
+  }
+  .cta-btn:hover { opacity: 0.88; }
+  .cta-btn-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: rgba(255,255,255,0.4);
+    padding: 13px 24px; border-radius: 6px;
+    font-size: 13px; text-decoration: none;
+     transition: all 0.15s;
+    margin-left: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .cta-btn-outline:hover { color: white; border-color: rgba(255,255,255,0.25); }
+
+  /* FOOTER */
+  footer { padding: 64px 80px 40px; border-top: 1px solid var(--grey-200); }
+  .footer-top {
+    display: grid; grid-template-columns: 1fr 2fr;
+    gap: 80px; padding-bottom: 48px;
+    border-bottom: 1px solid var(--grey-200); margin-bottom: 32px;
+  }
+  .footer-logo { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--black); margin-bottom: 10px; }
+  .footer-tagline { font-size: 12px; color: var(--grey-400); line-height: 1.7; max-width: 200px; font-weight: 300; }
+  .footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .footer-col h4 {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--grey-400); margin-bottom: 16px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a { font-size: 13px; color: var(--grey-600); text-decoration: none; transition: color 0.15s; }
+  .footer-col a:hover { color: var(--black); }
+  .footer-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.5px; color: var(--grey-400);
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── SIGNUP GATE ── */
+  .gate-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(10,10,10,0.5);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .gate-overlay.show { opacity: 1; pointer-events: all; }
+
+  .gate-modal {
+    background: var(--white);
+    border: 1px solid var(--g200);
+    border-radius: 16px;
+    padding: 48px;
+    max-width: 440px;
+    width: 90%;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+  .gate-overlay.show .gate-modal { transform: translateY(0); }
+
+  .gate-dismiss {
+    position: absolute; top: 16px; right: 18px;
+    font-size: 20px; color: var(--g400);
+     background: none; border: none;
+    transition: color 0.15s; line-height: 1;
+  }
+  .gate-dismiss:hover { color: var(--black); }
+
+  .gate-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--g400); margin-bottom: 14px; display: block;
+  }
+  .gate-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px; font-weight: 400; letter-spacing: -1.5px;
+    line-height: 1.05; color: var(--black); margin-bottom: 10px;
+  }
+  .gate-title em { font-style: italic; color: var(--g400); }
+  .gate-sub {
+    font-size: 13px; color: var(--g600); line-height: 1.7;
+    font-weight: 300; margin-bottom: 28px;
+  }
+
+  .gate-form { display: flex; flex-direction: column; gap: 10px; }
+  .gate-input {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid var(--g200); border-radius: 7px;
+    font-family: 'Manrope', sans-serif; font-size: 14px;
+    color: var(--black); background: var(--white);
+    outline: none; transition: border-color 0.15s;
+  }
+  .gate-input:focus { border-color: var(--black); }
+  .gate-input::placeholder { color: var(--g400); }
+  .gate-submit {
+    width: 100%; padding: 13px;
+    background: var(--black); color: white;
+    border: none; border-radius: 7px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px; font-weight: 600;
+     transition: opacity 0.15s; margin-top: 4px;
+  }
+  .gate-submit:hover { opacity: 0.85; }
+  .gate-note {
+    font-size: 11px; color: var(--g400); text-align: center;
+    margin-top: 10px; line-height: 1.6;
+  }
+
+  /* Directory blur wall */
+  .blur-wall {
+    position: relative;
+  }
+  .blur-wall::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 320px;
+    background: linear-gradient(to bottom, transparent, var(--white) 70%);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .lock-banner {
+    position: relative; z-index: 20;
+    text-align: center; padding: 32px 24px 48px;
+    border-top: 1px solid var(--g200);
+    background: var(--white);
+  }
+  .lock-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+  .lock-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px; letter-spacing: -1px; color: var(--black);
+    margin-bottom: 8px;
+  }
+  .lock-sub { font-size: 13px; color: var(--g600); margin-bottom: 20px; font-weight: 300; }
+  .lock-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--black); color: white;
+    padding: 12px 28px; border-radius: 7px;
+    font-size: 14px; font-weight: 600;
+     border: none;
+    font-family: 'Manrope', sans-serif;
+    transition: opacity 0.15s;
+  }
+  .lock-btn:hover { opacity: 0.85; }
+
+  /* Profile blur */
+  .profile-locked { position: relative; overflow: hidden; }
+  .profile-locked::after {
+    content: '';
+    position: absolute;
+    top: 40%; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, transparent, var(--white) 60%);
+    pointer-events: none; z-index: 10;
+  }
+  .profile-lock-banner {
+    position: relative; z-index: 20;
+    text-align: center; padding: 0 40px 48px;
+  }
+
+
+  /* ── MOBILE HAMBURGER NAV ── */
+  .nav-hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none;  padding: 4px;
+  }
+  .nav-hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--black); border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .nav-mobile-menu {
+    display: none; position: fixed;
+    top: 65px; left: 0; right: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--g200);
+    padding: 16px 24px 20px;
+    flex-direction: column; gap: 4px;
+    z-index: 99;
+  }
+  .nav-mobile-menu.open { display: flex; }
+  .nav-mobile-menu a {
+    font-size: 15px; color: var(--g600);
+    text-decoration: none; padding: 10px 0;
+    border-bottom: 1px solid var(--g100);
+    transition: color 0.15s;
+  }
+  .nav-mobile-menu a:last-child { border-bottom: none; }
+  .nav-mobile-menu a:hover { color: var(--black); }
+
+  @media (max-width: 768px) {
+    /* Nav */
+    nav { padding: 16px 24px; }
+    .nav-l, .nav-links { display: none !important; }
+    .nav-hamburger { display: flex; }
+    #navRight { display: none !important; }
+
+    /* Gate modal */
+    .gate-modal { padding: 32px 24px; }
+    .gate-title { font-size: 28px; }
+  }
+
+  @media (max-width: 768px) {
+    /* Hero — stack vertically */
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-left { padding: 40px 24px 40px; border-right: none; border-bottom: 1px solid var(--grey-200); }
+    .hero-h1 { font-size: 52px; letter-spacing: -2px; }
+    .hero-right { min-height: 420px; padding: 40px 24px; }
+
+    /* Search bar */
+    .search-bar { flex-direction: column; max-width: 100%; border-radius: 10px; }
+    .search-field { border-right: none !important; border-bottom: 1px solid var(--grey-200); }
+    .search-field:last-of-type { border-bottom: none; }
+    .search-btn { border-radius: 0 0 8px 8px; padding: 14px; }
+
+    /* Stats */
+    .hero-stats { max-width: 100%; }
+    .stat { padding: 12px 14px; }
+    .stat-num { font-size: 22px; }
+
+    /* Stylist cards in hero */
+    .stylist-cards { gap: 8px; }
+    .stylist-card { padding: 14px 16px; }
+
+    /* Tags section */
+    .tags-section { padding: 56px 24px; }
+    .section-header-row { grid-template-columns: 1fr; gap: 16px; }
+    .section-title { font-size: 36px; }
+
+    /* How it works */
+    .how-section { grid-template-columns: 1fr; }
+    .step { border-right: none !important; border-bottom: 1px solid var(--grey-200); padding: 48px 24px; }
+    .step:last-child { border-bottom: none; }
+
+    /* Featured */
+    .featured-section { padding: 56px 24px; }
+    .stylist-grid { grid-template-columns: 1fr; border-radius: 8px; }
+    .stylist-full-card { border-right: none !important; border-bottom: 1px solid var(--grey-200); }
+    .stylist-full-card:last-child { border-bottom: none; }
+
+    /* Footer */
+    footer { padding: 48px 24px 32px; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .footer-links { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  }
+
+</style>
+  <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/braidmap.js"></script>
+</head>
+<body>
+
+
+<!-- Netlify form (hidden, needed for detection) -->
+<form name="braidmap-signup" netlify netlify-honeypot="bot-field" hidden>
+  <input name="name" type="text">
+  <input name="email" type="email">
+</form>
+
+<!-- Gate overlay -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-modal">
+    <button class="gate-dismiss" id="gateDismiss">×</button>
+    <span class="gate-eyebrow">Join BraidMap</span>
+    <h2 class="gate-title">Unlock all<br><em>121 stylists</em></h2>
+    <p class="gate-sub">Sign up for free to browse every BIPOC hairstylist across BC — no spam, ever.</p>
+    <form class="gate-form" id="gateForm">
+      <input class="gate-input" id="gateName" name="name" type="text" placeholder="Your name" required>
+      <input class="gate-input" id="gateEmail" name="email" type="email" placeholder="Your email address" required>
+      <button class="gate-submit" type="submit">Unlock Full Directory →</button>
+    </form>
+    <p class="gate-note">Free forever. No spam. Unsubscribe anytime.<br>Already have an account? <a href="braidmap-auth.html?tab=login" style="color:var(--black);font-weight:600;text-decoration:underline;">Log in here</a></p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">B</div>BraidMap</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="braidmap-directory.html">Find a Stylist</a></li>
+          <li><a href="braidmap-suggest.html">Suggest a Stylist</a></li>
+  </ul>
+  <span id="navRight"></span>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="braidmap-directory.html">Find a Stylist</a>
+    <a href="braidmap-suggest.html">Suggest a Stylist</a>
+    <a href="braidmap-auth.html?tab=login">Log In</a>
+    <a href="braidmap-auth.html">Join Free</a>
+  </div></nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">BC's BIPOC Hair Directory — Est. 2026</p>
+    <h1 class="hero-h1">Find your<br><em>next</em><br>hair stylist</h1>
+    <p class="hero-sub">Discover talented BIPOC hairstylists across British Columbia — from knotless braids to locs, wigs to silk press.</p>
+    <div class="search-bar">
+      <div class="search-field">
+        <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Knotless braids, locs, silk press...">
+      </div>
+      <div class="search-field" style="max-width:140px;">
+        <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <select>
+          <option>All of BC</option>
+          <option>Vancouver</option>
+          <option>Surrey</option>
+          <option>Kelowna</option>
+          <option>Kamloops</option>
+          <option>Victoria</option>
+          <option>Nanaimo</option>
+        </select>
+      </div>
+      <button class="search-btn" id="searchBtn">Search →</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">121</span><span class="stat-label">Stylists</span></div>
+      <div class="stat"><span class="stat-num">16</span><span class="stat-label">Cities</span></div>
+      <div class="stat"><span class="stat-num">22</span><span class="stat-label">Style tags</span></div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <p class="hero-right-label">Featured stylists</p>
+    <div class="stylist-cards">
+      <div class="stylist-card">
+        <div class="s-avatar">M</div>
+        <div class="s-info">
+          <div class="s-name">Mou Jam Beauty</div>
+          <div class="s-loc">📍 Surrey, BC</div>
+          <div class="s-tags"><span class="s-tag">Knotless</span><span class="s-tag">Locs</span><span class="s-tag">Sew-In</span><span class="s-tag">Men's</span></div>
+        </div>
+        <div class="s-count">13</div>
+      </div>
+      <div class="stylist-card">
+        <div class="s-avatar">H</div>
+        <div class="s-info">
+          <div class="s-name">Hakuna Matata Salon</div>
+          <div class="s-loc">📍 Victoria, BC</div>
+          <div class="s-tags"><span class="s-tag">Box Braids</span><span class="s-tag">Twists</span><span class="s-tag">Silk Press</span></div>
+        </div>
+        <div class="s-count">14</div>
+      </div>
+      <div class="stylist-card">
+        <div class="s-avatar">D</div>
+        <div class="s-info">
+          <div class="s-name">DES Curl Spa</div>
+          <div class="s-loc">📍 Vancouver, BC</div>
+          <div class="s-tags"><span class="s-tag">Curly Cuts</span><span class="s-tag">K-Tips</span><span class="s-tag">Locs</span></div>
+        </div>
+        <div class="s-count">14</div>
+      </div>
+    </div>
+    <div class="hero-map-hint">
+      <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+      View map
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span class="marquee-item">Knotless Braids <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Cornrows <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Locs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Silk Press <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Twists <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Wigs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Crochet Installs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Sew-In <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Bridal Hair <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Natural Hair Care <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Knotless Braids <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Cornrows <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Locs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Silk Press <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Twists <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Wigs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Crochet Installs <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Sew-In <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Bridal Hair <span class="marquee-dot"></span></span>
+    <span class="marquee-item">Natural Hair Care <span class="marquee-dot"></span></span>
+  </div>
+</div>
+
+<!-- STYLE TAGS -->
+<section class="tags-section">
+  <div class="section-header-row">
+    <div>
+      <p class="eyebrow">Browse by Style</p>
+      <h2 class="section-title">What are you<br>looking <em>for?</em></h2>
+    </div>
+    <p class="section-desc">Filter by the exact style you need — we'll show you every specialist near you in BC. Click a style to explore.</p>
+  </div>
+  <div class="tags-grid">
+    <div class="tag-pill active">Knotless Braids <span class="tag-num">89</span></div>
+    <div class="tag-pill">Box Braids <span class="tag-num">76</span></div>
+    <div class="tag-pill">Cornrows <span class="tag-num">74</span></div>
+    <div class="tag-pill">Boho Braids <span class="tag-num">61</span></div>
+    <div class="tag-pill">Locs <span class="tag-num">54</span></div>
+    <div class="tag-pill">Twists <span class="tag-num">68</span></div>
+    <div class="tag-pill">Loc Retwist <span class="tag-num">45</span></div>
+    <div class="tag-pill">Wigs <span class="tag-num">42</span></div>
+    <div class="tag-pill">Sew-In <span class="tag-num">58</span></div>
+    <div class="tag-pill">Crochet Installs <span class="tag-num">37</span></div>
+    <div class="tag-pill">Soft Locs <span class="tag-num">33</span></div>
+    <div class="tag-pill">Butterfly Locs <span class="tag-num">29</span></div>
+    <div class="tag-pill">Men's Braids <span class="tag-num">39</span></div>
+    <div class="tag-pill">Kids Braids <span class="tag-num">51</span></div>
+    <div class="tag-pill">Silk Press <span class="tag-num">29</span></div>
+    <div class="tag-pill">Colouring <span class="tag-num">33</span></div>
+    <div class="tag-pill">Natural Hair Care <span class="tag-num">44</span></div>
+    <div class="tag-pill">Wash & Blow Dry <span class="tag-num">35</span></div>
+    <div class="tag-pill">Bridal Hair <span class="tag-num">28</span></div>
+    <div class="tag-pill">Tape-Ins / K-Tips <span class="tag-num">24</span></div>
+    <div class="tag-pill">Custom Wigs <span class="tag-num">19</span></div>
+    <div class="tag-pill">Relaxer <span class="tag-num">18</span></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="tags-section" style="border-bottom: none; padding-bottom: 0;">
+  <div class="section-header-row">
+    <div>
+      <p class="eyebrow">How It Works</p>
+      <h2 class="section-title">Simple as<br><em>1, 2, 3</em></h2>
+    </div>
+    <p class="section-desc">No scrolling through Instagram for hours. BraidMap makes finding your next stylist in BC fast, easy, and direct.</p>
+  </div>
+</section>
+<div class="how-section">
+  <div class="step">
+    <div class="step-num">01</div>
+    <h3 class="step-title">Search by style</h3>
+    <p class="step-desc">Tell us what you want — knotless braids, soft locs, silk press — and your city in BC.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">02</div>
+    <h3 class="step-title">Browse & compare</h3>
+    <p class="step-desc">See every stylist who specialises in your style, their location, deposit policy, and how to book.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">03</div>
+    <h3 class="step-title">Book directly</h3>
+    <p class="step-desc">Go straight to their booking link or Instagram. No middleman, no markup. Just you and your stylist.</p>
+  </div>
+</div>
+
+<!-- FEATURED -->
+<section class="featured-section">
+  <div class="featured-header">
+    <div>
+      <p class="eyebrow">Featured</p>
+      <h2 class="section-title">Stylists <em>near you</em></h2>
+    </div>
+    <a href="braidmap-directory.html" class="view-all">View all 121 →</a>
+  </div>
+  <div class="stylist-grid">
+    <a href="braidmap-profile.html?id=BM-0114" class="stylist-full-card" style="text-decoration:none;color:inherit;display:block;">
+      <div class="card-top"><div class="card-avatar">D</div><span class="card-city">Vancouver</span></div>
+      <div class="card-name">DES Curl Spa</div>
+      <div class="card-handle">@descurlspa</div>
+      <div class="card-tags">
+        <span class="card-tag">Knotless</span><span class="card-tag">Locs</span>
+        <span class="card-tag">Silk Press</span><span class="card-tag">K-Tips</span>
+        <span class="card-tag">Kids</span><span class="card-tag">+9 more</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-service-count">14</div>
+        <div class="card-deposit"><div class="deposit-dot"></div> Deposit req.</div>
+      </div>
+    </a>
+    <a href="braidmap-profile.html?id=BM-0121" class="stylist-full-card" style="text-decoration:none;color:inherit;display:block;">
+      <div class="card-top"><div class="card-avatar">H</div><span class="card-city">Victoria</span></div>
+      <div class="card-name">Hakuna Matata</div>
+      <div class="card-handle">@hakunamatatasalon</div>
+      <div class="card-tags">
+        <span class="card-tag">Box Braids</span><span class="card-tag">Cornrows</span>
+        <span class="card-tag">Twists</span><span class="card-tag">Silk Press</span>
+        <span class="card-tag">+10 more</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-service-count">14</div>
+        <div class="card-deposit"><div class="deposit-dot"></div> Deposit req.</div>
+      </div>
+    </a>
+    <a href="braidmap-profile.html?id=BM-0088" class="stylist-full-card" style="text-decoration:none;color:inherit;display:block;">
+      <div class="card-top"><div class="card-avatar">M</div><span class="card-city">Surrey</span></div>
+      <div class="card-name">Mou Jam Beauty</div>
+      <div class="card-handle">@moujam</div>
+      <div class="card-tags">
+        <span class="card-tag">Knotless</span><span class="card-tag">Locs</span>
+        <span class="card-tag">Sew-In</span><span class="card-tag">Men's</span>
+        <span class="card-tag">+9 more</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-service-count">13</div>
+        <div class="card-deposit" style="color:var(--grey-400);">Walk-in ok</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">BraidMap</div>
+      <p class="footer-tagline">A free directory of BIPOC hair stylists across British Columbia, Canada.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Discover</h4>
+        <ul>
+          <li><a href="braidmap-directory.html">Find a Stylist</a></li>
+          <li><a href="braidmap-suggest.html">Suggest a Stylist</a></li>
+          <li><a href="#">Browse by Style</a></li>
+          <li><a href="#">Browse by City</a></li>
+          
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="braidmap-report.html">Report an Issue</a></li>
+          <li><a href="mailto:braidmap@gmail.com">Contact</a></li>
+          <li><a href="https://instagram.com/braidmap" target="_blank">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 BraidMap. Supporting BIPOC hair professionals in BC.</span>
+    <span>Made with love for the community</span>
+  </div>
+</footer>
+
+<script>
+// ── MOBILE MENU ──
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if(hamburger && mobileMenu){
+    hamburger.addEventListener('click', function(){
+      mobileMenu.classList.toggle('open');
+    });
+  }
+
+  // ── TAG PILLS ──
+  const TAG_KEY_MAP = {
+    'Knotless Braids':'BraidsGeneral','Box Braids':'BraidsGeneral',
+    'Cornrows':'Cornrows','Boho Braids':'BraidsGeneral','Locs':'Locs',
+    'Twists':'Twists','Loc Retwist':'LocsRetwist','Wigs':'Wigs',
+    'Sew-In':'Installs','Crochet Installs':'CrochetInstalls',
+    'Soft Locs':'CrochetInstalls','Butterfly Locs':'CrochetInstalls',
+    "Men's Braids":'MensBraids',"Kids Braids":'KidsBraids',
+    'Silk Press':'SilkPress','Colouring':'Colouring',
+    'Natural Hair Care':'NaturalHairCare','Wash & Blow Dry':'WashBlowDry',
+    'Bridal Hair':'Bridals','Tape-Ins / K-Tips':'Installs',
+    'Custom Wigs':'CustomWigs','Relaxer':'Relaxer',
+    'Wash & Blow Dry':'WashBlowDry','Loc Retwist':'LocsRetwist'
+  };
+
+  document.querySelectorAll('.tag-pill').forEach(function(pill){
+    pill.addEventListener('click', function(){
+      document.querySelectorAll('.tag-pill').forEach(function(x){ x.classList.remove('active'); });
+      pill.classList.add('active');
+      const label = pill.childNodes[0].textContent.trim();
+      const key = TAG_KEY_MAP[label] || '';
+      window.location.href = 'braidmap-directory.html' + (key ? '?style=' + key : '');
+    });
+  });
+
+  // ── SEARCH ──
+  const searchBtn = document.getElementById('searchBtn');
+  if(searchBtn){
+    searchBtn.addEventListener('click', function(){
+      const input = document.querySelector('.search-field input');
+      const select = document.querySelector('.search-field select');
+      const q = input ? input.value.trim() : '';
+      const city = select ? select.value : '';
+      let url = 'braidmap-directory.html?';
+      if(q) url += 'q=' + encodeURIComponent(q) + '&';
+      if(city && city !== 'All of BC') url += 'city=' + encodeURIComponent(city);
+      window.location.href = url;
+    });
+  }
+
+  const searchInput = document.querySelector('.search-field input');
+  if(searchInput){
+    searchInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && searchBtn) searchBtn.click();
+    });
+  }
+
+  // ── GATE ──
+  const gateForm = document.getElementById('gateForm');
+  if(gateForm){
+    gateForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('gateName').value.trim();
+      const email = document.getElementById('gateEmail').value.trim();
+      if(!name || !email) return;
+      const fd = new FormData();
+      fd.append('form-name','braidmap-signup');
+      fd.append('name', name);
+      fd.append('email', email);
+      fetch('/', {method:'POST', body:fd}).catch(()=>{});
+      BM.login(name, email);
+      hideGate();
+      BM.renderNav();
+    });
+  }
+
+  const dismissBtn = document.getElementById('gateDismiss');
+  if(dismissBtn){
+    dismissBtn.addEventListener('click', hideGate);
+  }
+
+  // Show gate after 4s if not signed up
+  if(!BM.isLoggedIn()){
+    setTimeout(showGate, 4000);
+  }
+
+  BM.renderNav();
+});
+
+function showGate(){ const o=document.getElementById('gateOverlay'); if(o) o.classList.add('show'); }
+function hideGate(){ const o=document.getElementById('gateOverlay'); if(o) o.classList.remove('show'); }
+</script>
+</body>
+</html>

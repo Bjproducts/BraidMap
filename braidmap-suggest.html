@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Suggest a BIPOC hairstylist to be added to BraidMap.">
+<title>Suggest a Business — BraidMap</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/braidmap.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#0A0A0A;--white:#FAFAFA;--g100:#F2F2F2;--g200:#E0E0E0;--g400:#A0A0A0;--g600:#555}
+body{background:var(--white);color:var(--black);font-family:'Manrope',sans-serif;min-height:100vh}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(250,250,250,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--g200)}
+.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px;color:var(--black);display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-m{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-style:italic}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{font-size:13px;color:var(--g600);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--black)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.btn-login{font-size:13px;color:var(--g600);text-decoration:none;padding:8px 16px;border-radius:6px;border:1px solid var(--g200)}
+.btn-join{font-size:13px;font-weight:600;color:white;background:var(--black);text-decoration:none;padding:9px 20px;border-radius:6px}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--black);border-radius:2px}
+.mobile-menu{display:none;position:fixed;top:65px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--g200);padding:16px 24px 20px;flex-direction:column;gap:4px;z-index:99}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:15px;color:var(--g600);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--g100)}
+
+/* HERO */
+.hero{background:var(--black);padding:120px 80px 72px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px}
+.hero-inner{position:relative;max-width:640px}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:20px;display:block}
+.hero-title{font-family:'Instrument Serif',serif;font-size:56px;font-weight:400;letter-spacing:-2px;line-height:1.05;color:white;margin-bottom:16px}
+.hero-title em{font-style:italic;color:rgba(255,255,255,.4)}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.4);line-height:1.8;font-weight:300}
+
+/* NOTICE BANNER */
+.notice{background:var(--g100);border-bottom:1px solid var(--g200);padding:16px 80px;display:flex;align-items:center;gap:12px}
+.notice-icon{font-size:18px;flex-shrink:0}
+.notice-text{font-size:13px;color:var(--g600);line-height:1.6}
+.notice-text strong{color:var(--black);font-weight:600}
+
+/* FORM SECTION */
+.form-section{max-width:760px;margin:0 auto;padding:64px 80px}
+
+.form-block{margin-bottom:40px}
+.block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--g400);margin-bottom:16px;display:block}
+.block-title{font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-.5px;color:var(--black);margin-bottom:20px}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g600)}
+.form-label span{color:var(--g400);font-weight:300} /* optional marker */
+.form-input{padding:12px 14px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);background:white;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--black)}
+.form-input::placeholder{color:var(--g400)}
+textarea.form-input{resize:vertical;min-height:100px;line-height:1.6}
+select.form-input{cursor:pointer}
+
+/* Style tag checkboxes */
+.tag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tag-check{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--g200);border-radius:6px;cursor:pointer;transition:all .15s;user-select:none}
+.tag-check:hover{border-color:var(--g400)}
+.tag-check.checked{background:var(--black);border-color:var(--black);color:white}
+.tag-check input{display:none}
+.tag-check-label{font-size:12px;font-weight:400}
+.tag-check.checked .tag-check-label{color:white}
+
+/* Divider */
+.divider{height:1px;background:var(--g200);margin:40px 0}
+
+/* Submit */
+.submit-wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-top:8px}
+.submit-note{font-size:12px;color:var(--g400);line-height:1.6;max-width:360px}
+.btn-submit{display:inline-flex;align-items:center;gap:8px;background:var(--black);color:white;padding:14px 32px;border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:opacity .15s}
+.btn-submit:hover{opacity:.85}
+
+/* Success state */
+.success-state{display:none;text-align:center;padding:80px 40px}
+.success-icon{font-size:48px;margin-bottom:20px;display:block}
+.success-title{font-family:'Instrument Serif',serif;font-size:40px;letter-spacing:-1.5px;color:var(--black);margin-bottom:12px}
+.success-sub{font-size:14px;color:var(--g600);line-height:1.7;margin-bottom:28px}
+.success-link{color:var(--black);font-weight:600;text-decoration:none}
+
+@media(max-width:768px){
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  .nav-right{gap:6px}
+  .nav-hamburger{display:flex}
+  .hero{padding:90px 24px 48px}
+  .hero-title{font-size:36px}
+  .notice{padding:14px 24px}
+  .form-section{padding:40px 24px}
+  .form-row{grid-template-columns:1fr}
+  .tag-grid{grid-template-columns:1fr 1fr}
+  .submit-wrap{flex-direction:column;align-items:flex-start}
+  .btn-submit{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Netlify form (hidden for detection) -->
+<form name="braidmap-suggest" netlify netlify-honeypot="bot-field" hidden>
+  <input name="business_name"><input name="city"><input name="instagram">
+  <input name="tiktok"><input name="facebook"><input name="website">
+  <input name="phone"><input name="booking_link"><input name="styles">
+  <input name="submitter_name"><input name="submitter_email"><textarea name="notes"></textarea>
+</form>
+
+<nav>
+  <a href="index.html" class="logo"><div class="logo-m">B</div>BraidMap</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="braidmap-directory.html">Find a Stylist</a></li>
+  </ul>
+  <div class="nav-right" id="navRight"></div>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="braidmap-directory.html">Find a Stylist</a>
+    <a href="braidmap-report.html">Report an Issue</a>
+    <a href="braidmap-auth.html?tab=login">Log In</a>
+    <a href="braidmap-auth.html">Join Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Community</span>
+    <h1 class="hero-title">Suggest a<br><em>BIPOC stylist</em></h1>
+    <p class="hero-sub">Know a talented BIPOC hairstylist in BC who should be on BraidMap? Tell us about them and we'll reach out to verify and add them to the directory.</p>
+  </div>
+</div>
+
+<!-- NOTICE -->
+<div class="notice">
+  <span class="notice-icon">ℹ️</span>
+  <p class="notice-text"><strong>All submissions are reviewed before publishing.</strong> We verify each business to ensure accuracy before adding them to the directory. This usually takes 3–5 business days.</p>
+</div>
+
+<!-- FORM -->
+<div class="form-section">
+  <div id="formWrap">
+
+    <!-- Business Info -->
+    <div class="form-block">
+      <span class="block-label">Step 1 of 3</span>
+      <h2 class="block-title">Business information</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input class="form-input" id="f_name" type="text" placeholder="e.g. Crown Hair Studio">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City in BC</label>
+          <select class="form-input" id="f_city">
+            <option value="">Select a city...</option>
+            <option>Abbotsford</option><option>Burnaby</option><option>Chilliwack</option>
+            <option>Coquitlam</option><option>Delta</option><option>Kamloops</option>
+            <option>Kelowna</option><option>Langley</option><option>Maple Ridge</option>
+            <option>Nanaimo</option><option>New Westminster</option><option>Prince George</option>
+            <option>Richmond</option><option>Surrey</option><option>Vancouver</option>
+            <option>Victoria</option><option>Other BC City</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram Handle</label>
+          <input class="form-input" id="f_ig" type="text" placeholder="@username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">TikTok <span>(optional)</span></label>
+          <input class="form-input" id="f_tiktok" type="text" placeholder="@username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Facebook <span>(optional)</span></label>
+          <input class="form-input" id="f_facebook" type="text" placeholder="Page name or URL">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Booking Link <span>(optional)</span></label>
+          <input class="form-input" id="f_booking" type="url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number <span>(optional)</span></label>
+          <input class="form-input" id="f_phone" type="tel" placeholder="604 000 0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website <span>(optional)</span></label>
+          <input class="form-input" id="f_website" type="url" placeholder="https://...">
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Style Tags -->
+    <div class="form-block">
+      <span class="block-label">Step 2 of 3</span>
+      <h2 class="block-title">Services offered</h2>
+      <p style="font-size:13px;color:var(--g600);margin-bottom:20px;font-weight:300;">Select all the styles and services this stylist offers.</p>
+      <div class="tag-grid" id="tagGrid"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Your Info -->
+    <div class="form-block">
+      <span class="block-label">Step 3 of 3</span>
+      <h2 class="block-title">Your details</h2>
+      <p style="font-size:13px;color:var(--g600);margin-bottom:20px;font-weight:300;">We may contact you if we need more information about this suggestion.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" id="f_yourname" type="text" placeholder="Jane Doe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Email</label>
+          <input class="form-input" id="f_youremail" type="email" placeholder="jane@example.com">
+        </div>
+        <div class="form-group full" style="margin-bottom:0">
+          <label class="form-label">Additional Notes <span>(optional)</span></label>
+          <textarea class="form-input" id="f_notes" placeholder="Anything else we should know about this stylist..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <p class="submit-note">By submitting, you confirm this is a BIPOC-owned hair business in BC. All listings are verified before going live — this typically takes 3–5 business days.</p>
+      <button class="btn-submit" id="submitSuggestBtn">Submit Suggestion →</button>
+    </div>
+
+  </div>
+
+  <!-- Success state -->
+  <div class="success-state" id="successState">
+    <span class="success-icon">🎉</span>
+    <h2 class="success-title">Thank you!</h2>
+    <p class="success-sub">Your suggestion has been received. We'll verify the business and reach out if we need more info. Once confirmed, they'll appear on BraidMap within 3–5 business days.</p>
+    <a href="braidmap-directory.html" class="success-link">← Browse the directory</a>
+  </div>
+</div>
+
+<script>
+const TAG_LABELS = {
+  'BraidsGeneral':'Box Braids / Knotless Braids','BraidsOnDreadlock':'Braids on Dreadlocks',
+  'Cornrows':'Cornrows','Twists':'Twists','Locs':'Locs Installation',
+  'LocsRetwist':'Loc Retwist / Maintenance','Installs':'Hair Extensions / Sew-In',
+  'Wigs':'Wig Installs','CustomWigs':'Custom Wigs','WigMaintenance':'Wig Maintenance',
+  'WigRevamp':'Wig Revamp','CrochetInstalls':'Crochet / Faux Locs',
+  'MensBraids':"Men's Braids",'KidsBraids':"Kids' Braids",
+  'BraidTakeDown':'Braid Takedown','WashBlowDry':'Wash & Blow Dry',
+  'Relaxer':'Relaxer','Colouring':'Colouring / Hair Colour',
+  'Ponytails':'Ponytails','Bridals':'Bridal Hair',
+  'SilkPress':'Silk Press','NaturalHairCare':'Natural Hair Care'
+};
+
+// Build tag checkboxes
+const tagGrid = document.getElementById('tagGrid');
+Object.entries(TAG_LABELS).forEach(([k,v]) => {
+  const div = document.createElement('div');
+  div.className = 'tag-check';
+  div.dataset.key = k;
+  div.innerHTML = `<input type="checkbox" id="tag_${k}"><label class="tag-check-label">${v}</label>`;
+  div.addEventListener('click', () => {
+    div.classList.toggle('checked');
+  });
+  tagGrid.appendChild(div);
+});
+
+function getSelectedTags(){
+  return [...document.querySelectorAll('.tag-check.checked')].map(d => TAG_LABELS[d.dataset.key]).join(', ');
+}
+
+function submitSuggestion(){
+  const name = document.getElementById('f_name').value.trim();
+  const city = document.getElementById('f_city').value;
+  const ig = document.getElementById('f_ig').value.trim();
+  const yourname = document.getElementById('f_yourname').value.trim();
+  const youremail = document.getElementById('f_youremail').value.trim();
+
+  if(!name){ alert('Please enter the business name.'); return; }
+  if(!city){ alert('Please select a city.'); return; }
+  if(!ig){ alert('Please enter an Instagram handle.'); return; }
+  if(!yourname){ alert('Please enter your name.'); return; }
+  if(!youremail || !youremail.includes('@')){ alert('Please enter a valid email.'); return; }
+
+  const fd = new FormData();
+  fd.append('form-name', 'braidmap-suggest');
+  fd.append('business_name', name);
+  fd.append('city', city);
+  fd.append('instagram', ig);
+  fd.append('tiktok', document.getElementById('f_tiktok').value.trim());
+  fd.append('facebook', document.getElementById('f_facebook').value.trim());
+  fd.append('booking_link', document.getElementById('f_booking').value.trim());
+  fd.append('phone', document.getElementById('f_phone').value.trim());
+  fd.append('website', document.getElementById('f_website').value.trim());
+  fd.append('styles', getSelectedTags());
+  fd.append('submitter_name', yourname);
+  fd.append('submitter_email', youremail);
+  fd.append('notes', document.getElementById('f_notes').value.trim());
+
+  fetch('/', { method: 'POST', body: fd })
+    .catch(() => {})
+    .finally(() => {
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('successState').style.display = 'block';
+    });
+}
+
+
+// updateNav -> BM.renderNav
+
+BM.renderNav();
+document.getElementById('submitSuggestBtn') && document.getElementById('submitSuggestBtn').addEventListener('click', submitSuggestion);
+</script>
+</body>
+</html>
