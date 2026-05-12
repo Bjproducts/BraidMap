@@ -3,165 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Browse 121 BIPOC hairstylists across BC. Filter by city, style, and book directly.">
+<meta property="og:title" content="Find a Stylist — BraidMap">
+<meta property="og:description" content="Browse 121 BIPOC hairstylists across BC. Filter by city, style, and book directly.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
 <title>Find a Stylist — BraidMap</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/braidmap.css">
 <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/log.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/data.js"></script>
+<script src="js/core/nav.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--black:#0A0A0A;--white:#FAFAFA;--g100:#F2F2F2;--g200:#E0E0E0;--g400:#A0A0A0;--g600:#555555}
-body{background:var(--white);color:var(--black);font-family:'Manrope',sans-serif;}
+/* ── Page-specific: Directory ── */
 
+/* Page header */
+.page-header { padding: 110px 80px 48px; border-bottom: 1px solid var(--g200); display: flex; justify-content: space-between; align-items: flex-end; }
+.page-title { font-family: var(--font-serif); font-size: 56px; font-weight: 400; letter-spacing: -2px; line-height: 1; }
+.page-title em { font-style: italic; color: var(--g400); }
+.result-wrap { text-align: right; }
+.result-num { font-family: var(--font-serif); font-size: 48px; color: var(--black); letter-spacing: -2px; display: block; line-height: 1; }
+.result-label { font-size: 12px; color: var(--g400); font-family: var(--font-mono); }
 
+/* Layout */
+.layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 200px); }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(250,250,250,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--g200)}
-.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px;color:var(--black);display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-m{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:14px;font-style:italic}
-.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
-.nav-links a{font-size:13px;color:var(--g600);text-decoration:none;transition:color .15s}
-.nav-links a:hover,.nav-links a.active{color:var(--black);font-weight:600}
-.nav-right{display:flex;align-items:center;gap:10px}
-.btn-login{font-size:13px;color:var(--g600);text-decoration:none;padding:8px 16px;border-radius:6px;border:1px solid var(--g200);transition:all .15s;font-family:'Manrope',sans-serif}
-.btn-login:hover{border-color:var(--black);color:var(--black)}
-.btn-join{font-size:13px;font-weight:600;color:white;background:var(--black);text-decoration:none;padding:9px 20px;border-radius:6px;transition:opacity .15s;font-family:'Manrope',sans-serif}
-.btn-join:hover{opacity:.85}
-.nav-member{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-avatar{width:32px;height:32px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:14px;color:white}
-.nav-name{font-size:13px;color:var(--g600);font-weight:500}
-.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--black);border-radius:2px}
-.mobile-menu{display:none;position:fixed;top:65px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--g200);padding:16px 24px 20px;flex-direction:column;gap:4px;z-index:299}
-.mobile-menu.open{display:flex}
-.mobile-menu a{font-size:15px;color:var(--g600);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--g100)}
-.mobile-menu a:last-child{border-bottom:none}
+/* Sidebar */
+.sidebar { border-right: 1px solid var(--g200); padding: 28px 20px; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; }
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 2px; }
+.filter-group { margin-bottom: 28px; }
+.filter-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--g400); margin-bottom: 10px; display: block; }
+.search-wrap { position: relative; }
+.search-input { width: 100%; padding: 9px 12px 9px 32px; border: 1px solid var(--g200); border-radius: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--black); background: white; outline: none; transition: border-color 0.15s; }
+.search-input:focus { border-color: var(--black); }
+.search-input::placeholder { color: var(--g400); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--g400); }
+.city-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.city-pill { padding: 5px 10px; border-radius: 4px; border: 1px solid var(--g200); font-size: 11px; color: var(--g600); transition: all 0.15s; background: white; font-family: var(--font-sans); }
+.city-pill:hover { border-color: var(--black); color: var(--black); }
+.city-pill.on { background: var(--black); border-color: var(--black); color: white; }
+.style-list { display: flex; flex-direction: column; gap: 1px; }
+.style-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 5px; transition: background 0.12s; }
+.style-item:hover { background: var(--g100); }
+.style-item.on { background: var(--black); }
+.style-item-name { font-size: 12px; color: var(--g600); }
+.style-item.on .style-item-name { color: white; }
+.style-item:hover .style-item-name { color: var(--black); }
+.style-item-count { font-family: var(--font-mono); font-size: 10px; color: var(--g400); }
+.style-item.on .style-item-count { color: rgba(255,255,255,.4); }
+.clear-btn { width: 100%; padding: 8px; border: 1px solid var(--g200); border-radius: 6px; background: none; font-family: var(--font-sans); font-size: 12px; color: var(--g400); transition: all 0.15s; margin-top: 12px; }
+.clear-btn:hover { border-color: var(--black); color: var(--black); }
 
-/* PAGE HEADER */
-.page-header{padding:110px 80px 48px;border-bottom:1px solid var(--g200);display:flex;justify-content:space-between;align-items:flex-end}
-.eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--g400);margin-bottom:12px}
-.page-title{font-family:'Instrument Serif',serif;font-size:56px;font-weight:400;letter-spacing:-2px;line-height:1}
-.page-title em{font-style:italic;color:var(--g400)}
-.result-wrap{text-align:right}
-.result-num{font-family:'Instrument Serif',serif;font-size:48px;color:var(--black);letter-spacing:-2px;display:block;line-height:1}
-.result-label{font-size:12px;color:var(--g400);font-family:'DM Mono',monospace}
+/* Grid area */
+.grid-area { padding: 24px 32px; }
+.sort-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.filter-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); }
+.sort-select { font-family: var(--font-mono); font-size: 11px; color: var(--g600); border: 1px solid var(--g200); border-radius: 4px; padding: 5px 9px; background: white; outline: none; }
 
-/* LAYOUT */
-.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 200px)}
+/* Cards */
+.cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+.card { border: 1px solid var(--g200); border-radius: 10px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; background: white; display: flex; flex-direction: column; cursor: pointer; }
+.card:hover { border-color: var(--g400); transform: translateY(-2px); }
+.card-body { padding: 20px 20px 16px; flex: 1; display: block; text-decoration: none; color: inherit; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.card-av { width: 40px; height: 40px; background: var(--black); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 16px; font-style: italic; color: white; flex-shrink: 0; }
+.card-city-badge { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); border: 1px solid var(--g200); padding: 3px 7px; border-radius: 3px; }
+.card-name { font-family: var(--font-serif); font-size: 16px; color: var(--black); margin-bottom: 2px; letter-spacing: -.3px; line-height: 1.2; }
+.card-handle { font-family: var(--font-mono); font-size: 10px; color: var(--g400); margin-bottom: 12px; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.card-tag { background: var(--g100); color: var(--g600); border: 1px solid var(--g200); border-radius: 3px; padding: 2px 7px; font-size: 10px; font-family: var(--font-mono); }
+.card-tag.active-tag { background: var(--black); color: white; border-color: var(--black); }
+.card-footer { display: flex; align-items: center; justify-content: space-between; background: var(--g100); padding: 12px 20px 16px; border-top: 1px solid var(--g200); margin-top: auto; }
+.card-count { font-family: var(--font-serif); font-size: 13px; color: var(--g400); display: flex; align-items: center; gap: 4px; }
+.card-count strong { font-size: 24px; color: var(--g200); letter-spacing: -1px; font-style: italic; }
+.card-actions { display: flex; gap: 6px; align-items: center; }
+.card-deposit { font-family: var(--font-mono); font-size: 9px; color: var(--g400); display: flex; align-items: center; gap: 3px; }
+.card-deposit-dot { width: 4px; height: 4px; background: var(--black); border-radius: 50%; }
+.btn-book-card { padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; font-family: var(--font-sans); background: var(--black); color: white; border: none; white-space: nowrap; }
+.btn-book-card:hover { opacity: .8; }
+.btn-dm { background: var(--g100); color: var(--g400); font-weight: 400; font-size: 10px; }
 
-/* SIDEBAR */
-.sidebar{border-right:1px solid var(--g200);padding:28px 20px;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto}
-.sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--g200);border-radius:2px}
-.filter-group{margin-bottom:28px}
-.filter-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:10px;display:block}
-.search-wrap{position:relative}
-.search-input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--g200);border-radius:6px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--black);background:white;outline:none;transition:border-color .15s}
-.search-input:focus{border-color:var(--black)}
-.search-input::placeholder{color:var(--g400)}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--g400)}
-.city-pills{display:flex;flex-wrap:wrap;gap:5px}
-.city-pill{padding:5px 10px;border-radius:4px;border:1px solid var(--g200);font-size:11px;color:var(--g600);transition:all .15s;background:white;font-family:'Manrope',sans-serif}
-.city-pill:hover{border-color:var(--black);color:var(--black)}
-.city-pill.on{background:var(--black);border-color:var(--black);color:white}
-.style-list{display:flex;flex-direction:column;gap:1px}
-.style-item{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:5px;transition:background .12s}
-.style-item:hover{background:var(--g100)}
-.style-item.on{background:var(--black)}
-.style-item-name{font-size:12px;color:var(--g600)}
-.style-item.on .style-item-name,.style-item:hover .style-item-name{color:var(--black)}
-.style-item.on .style-item-name{color:white}
-.style-item-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400)}
-.style-item.on .style-item-count{color:rgba(255,255,255,.4)}
-.clear-btn{width:100%;padding:8px;border:1px solid var(--g200);border-radius:6px;background:none;font-family:'Manrope',sans-serif;font-size:12px;color:var(--g400);transition:all .15s;margin-top:12px}
-.clear-btn:hover{border-color:var(--black);color:var(--black)}
+/* No results */
+.no-results { grid-column: 1 / -1; text-align: center; padding: 72px 40px; }
+.no-results-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+.no-results h3 { font-family: var(--font-serif); font-size: 32px; letter-spacing: -1px; color: var(--black); margin-bottom: 10px; }
+.no-results h3 em { font-style: italic; color: var(--g400); }
+.no-results p { font-size: 14px; color: var(--g600); line-height: 1.7; font-weight: 300; max-width: 380px; margin: 0 auto 24px; }
+.no-results-link { display: inline-flex; align-items: center; gap: 8px; background: var(--black); color: white; padding: 12px 24px; border-radius: 7px; font-size: 13px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; }
+.no-results-link:hover { opacity: .85; }
 
-/* GRID AREA */
-.grid-area{padding:24px 32px}
-.sort-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.filter-status{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--g400)}
-.sort-select{font-family:'DM Mono',monospace;font-size:11px;color:var(--g600);border:1px solid var(--g200);border-radius:4px;padding:5px 9px;background:white;outline:none;}
+/* Mobile filter button */
+.mobile-filter-btn { display: none; }
 
-/* CARDS */
-.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
-.card{border:1px solid var(--g200);border-radius:10px;padding:20px;overflow:hidden;transition:border-color .2s,transform .2s;background:white;display:block;text-decoration:none;color:inherit}
-.card:hover{border-color:var(--g400);transform:translateY(-2px)}
-.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.card-av{width:40px;height:40px;background:var(--black);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:16px;font-style:italic;color:white;flex-shrink:0}
-.card-city-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g400);border:1px solid var(--g200);padding:3px 7px;border-radius:3px}
-.card-name{font-family:'Instrument Serif',serif;font-size:16px;color:var(--black);margin-bottom:2px;letter-spacing:-.3px;line-height:1.2}
-.card-handle{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);margin-bottom:12px}
-.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0}
-.card-tag{background:var(--g100);color:var(--g600);border:1px solid var(--g200);border-radius:3px;padding:2px 7px;font-size:10px;font-family:'DM Mono',monospace}
-.card-tag.active-tag{background:var(--black);color:white;border-color:var(--black)}
-.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--g200);background:var(--g100);margin:14px -20px -20px;padding:12px 20px 16px;border-radius:0 0 10px 10px;border-top:1px solid var(--g200)}
-.card-count{font-family:'Instrument Serif',serif;font-size:13px;color:var(--g400);display:flex;align-items:center;gap:4px}
-.card-count strong{font-size:24px;color:var(--g200);letter-spacing:-1px;font-style:italic}
-.card-actions{display:flex;gap:6px;align-items:center}
-.card-deposit{font-family:'DM Mono',monospace;font-size:9px;color:var(--g400);display:flex;align-items:center;gap:3px}
-.card-deposit-dot{width:4px;height:4px;background:var(--black);border-radius:50%}
-.btn-book{padding:6px 14px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;transition:opacity .15s;font-family:'Manrope',sans-serif;background:var(--black);color:white;border:none;white-space:nowrap}
-.btn-book:hover{opacity:.8}
-.btn-dm{background:var(--g100);color:var(--g400);font-weight:400;font-size:10px}
-
-/* NO RESULTS */
-.no-results{grid-column:1/-1;text-align:center;padding:72px 40px}
-.no-results-icon{font-size:40px;margin-bottom:20px;display:block}
-.no-results h3{font-family:'Instrument Serif',serif;font-size:32px;letter-spacing:-1px;color:var(--black);margin-bottom:10px}
-.no-results h3 em{font-style:italic;color:var(--g400)}
-.no-results p{font-size:14px;color:var(--g600);line-height:1.7;font-weight:300;max-width:380px;margin:0 auto 24px}
-.no-results-link{display:inline-flex;align-items:center;gap:8px;background:var(--black);color:white;padding:12px 24px;border-radius:7px;font-size:13px;font-weight:600;text-decoration:none;transition:opacity .15s}
-.no-results-link:hover{opacity:.85}
-
-/* GATE OVERLAY */
-.gate-overlay{position:fixed;inset:0;z-index:400;background:rgba(10,10,10,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-.gate-overlay.show{opacity:1;pointer-events:all}
-.gate-box{background:white;border-radius:16px;padding:48px;max-width:420px;width:90%;position:relative;transform:translateY(24px);transition:transform .3s}
-.gate-overlay.show .gate-box{transform:translateY(0)}
-.gate-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:14px;display:block}
-.gate-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;letter-spacing:-1.5px;line-height:1.1;color:var(--black);margin-bottom:10px}
-.gate-title em{font-style:italic;color:var(--g400)}
-.gate-sub{font-size:13px;color:var(--g600);line-height:1.7;font-weight:300;margin-bottom:24px}
-.gate-form{display:flex;flex-direction:column;gap:10px}
-.gate-inp{width:100%;padding:12px 14px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);outline:none;transition:border-color .15s}
-.gate-inp:focus{border-color:var(--black)}
-.gate-inp::placeholder{color:var(--g400)}
-.gate-btn{width:100%;padding:13px;background:var(--black);color:white;border:none;border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;transition:opacity .15s;margin-top:4px}
-.gate-btn:hover{opacity:.85}
-.gate-note{font-size:11px;color:var(--g400);text-align:center;margin-top:12px;line-height:1.7}
-.gate-note a{color:var(--black);font-weight:600;text-decoration:none}
-
-/* LOCK BANNER */
-.lock-wrap{position:relative}
-.lock-fade{position:absolute;top:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,white);pointer-events:none;z-index:5}
-.lock-banner{background:white;border-top:1px solid var(--g200);text-align:center;padding:40px 24px 48px;position:relative;z-index:6}
-.lock-icon{font-size:28px;margin-bottom:12px;display:block}
-.lock-title{font-family:'Instrument Serif',serif;font-size:26px;letter-spacing:-.5px;margin-bottom:8px}
-.lock-sub{font-size:13px;color:var(--g600);font-weight:300;margin-bottom:20px;line-height:1.6}
-.lock-btn{display:inline-flex;align-items:center;gap:8px;background:var(--black);color:white;padding:12px 28px;border-radius:7px;font-size:14px;font-weight:600;border:none;font-family:'Manrope',sans-serif;transition:opacity .15s}
-.lock-btn:hover{opacity:.85}
-
-/* MOBILE */
-.mobile-filter-btn{display:none}
-@media(max-width:768px){
-  nav{padding:16px 24px}
-  .nav-links{display:none}
-  .nav-right{gap:6px}
-  .btn-login{padding:6px 10px;font-size:12px}
-  .btn-join{padding:7px 14px;font-size:12px}
-  .nav-hamburger{display:flex}
-  .page-header{padding:90px 24px 32px;flex-direction:column;gap:12px;align-items:flex-start}
-  .page-title{font-size:40px}
-  .result-wrap{text-align:left}
-  .layout{grid-template-columns:1fr}
-  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--g200);padding:0;display:none}
-  .sidebar.open{display:block;padding:20px 24px}
-  .mobile-filter-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px solid var(--black);border-radius:6px;background:white;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--black);margin-bottom:16px}
-  .grid-area{padding:20px 24px}
-  .cards-grid{grid-template-columns:1fr}
+@media (max-width: 1024px) {
+  .page-header { padding: 100px 48px 40px; }
+  .layout { grid-template-columns: 220px 1fr; }
+  .grid-area { padding: 24px 24px; }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .page-header { padding: 90px 24px 32px; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .page-title { font-size: 40px; }
+  .result-wrap { text-align: left; }
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--g200); padding: 0; display: none; }
+  .sidebar.open { display: block; padding: 20px 24px; }
+  .mobile-filter-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1.5px solid var(--black); border-radius: 6px; background: white; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--black); margin-bottom: 16px; }
+  .grid-area { padding: 20px 24px; }
+  .cards-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
+
+<a href="#cardsWrap" class="skip-link">Skip to stylists</a>
+
 <!-- Netlify form -->
 <form name="braidmap-signup" netlify netlify-honeypot="bot-field" hidden>
   <input name="name"><input name="email">
@@ -174,8 +137,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
     <h2 class="gate-title">Unlock all<br><em>121 stylists</em></h2>
     <p class="gate-sub">Sign up free to browse every BIPOC hairstylist across BC — filter by city, style and book directly.</p>
     <form class="gate-form" id="gateForm">
-      <input class="gate-inp" id="gateName" type="text" placeholder="Your name" required>
-      <input class="gate-inp" id="gateEmail" type="email" placeholder="Your email address" required>
+      <input class="gate-inp" id="gateName" type="text" placeholder="Your name" required autocomplete="name">
+      <input class="gate-inp" id="gateEmail" type="email" placeholder="Your email address" required autocomplete="email">
       <button class="gate-btn" type="submit">Unlock Full Directory →</button>
     </form>
     <p class="gate-note">Free forever. No spam. Unsubscribe anytime.<br>Already have an account? <a href="braidmap-auth.html?tab=login">Log in here</a></p>
@@ -184,13 +147,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo"><div class="logo-m">B</div>BraidMap</a>
+  <a href="index.html" class="logo"><div class="logo-mark">B</div>BraidMap</a>
   <ul class="nav-links" id="navLinks">
     <li><a href="braidmap-directory.html" class="active">Find a Stylist</a></li>
   </ul>
-  <div class="nav-right" id="navRight"></div>
-  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  <div class="mobile-menu" id="mobileMenu">
+  <div id="navRight"></div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  <div class="nav-mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile menu">
     <a href="braidmap-directory.html">Find a Stylist</a>
     <a href="braidmap-suggest.html">Suggest a Stylist</a>
     <a href="braidmap-auth.html?tab=login">Log In</a>
@@ -199,297 +162,319 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 </nav>
 
 <!-- PAGE HEADER -->
-<div class="page-header">
+<header class="page-header">
   <div>
     <p class="eyebrow">Directory</p>
     <h1 class="page-title">Find your<br><em>stylist</em></h1>
   </div>
   <div class="result-wrap">
-    <span class="result-num" id="resultNum">121</span>
+    <span class="result-num" id="resultNum" aria-live="polite">—</span>
     <span class="result-label">stylists in BC</span>
   </div>
-</div>
+</header>
 
 <!-- LAYOUT -->
 <div class="layout">
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" role="complementary" aria-label="Filters">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g200);">
-      <span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--black);font-weight:500;">Filters</span>
+      <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--black);font-weight:500;">Filters</span>
       <button class="clear-btn" id="clearBtn" style="width:auto;margin-top:0;padding:5px 12px;font-size:11px;">Clear all</button>
     </div>
     <div class="filter-group">
-      <span class="filter-label">Search</span>
+      <label class="filter-label" for="searchInput">Search</label>
       <div class="search-wrap">
-        <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="search-input" id="searchInput" type="text" placeholder="Search by name, style or keyword...">
       </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">City</span>
-      <div class="city-pills" id="cityPills"></div>
+      <div class="city-pills" id="cityPills" role="group" aria-label="Filter by city"></div>
     </div>
     <div class="filter-group">
       <span class="filter-label">Style</span>
-      <div class="style-list" id="styleList"></div>
+      <div class="style-list" id="styleList" role="group" aria-label="Filter by style"></div>
     </div>
   </aside>
 
-  <div class="grid-area">
-    <button class="mobile-filter-btn" id="mobileFilterBtn">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+  <main class="grid-area" role="main">
+    <button class="mobile-filter-btn" id="mobileFilterBtn" aria-expanded="false" aria-controls="sidebar">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       Filters
     </button>
     <div class="sort-bar">
-      <span class="filter-status" id="filterStatus">All stylists</span>
+      <span class="filter-status" id="filterStatus" aria-live="polite">Loading...</span>
+      <label class="sr-only" for="sortSelect">Sort by</label>
       <select class="sort-select" id="sortSelect">
         <option value="count">Most services</option>
         <option value="name">A → Z</option>
         <option value="city">By city</option>
       </select>
     </div>
-    <div id="cardsWrap"></div>
-  </div>
+    <div id="cardsWrap">
+      <div class="loading-state" aria-live="polite">
+        <span class="loading-state-text">Loading stylists...</span>
+      </div>
+    </div>
+  </main>
 </div>
 
 <script>
-const FREE_LIMIT = 6;
-let TAG_LABELS = {}, CITIES = [], STYLE_COUNTS = {}, STYLISTS = [];
+var FREE_LIMIT = 6;
+var TAG_LABELS = {}, CITIES = [], STYLE_COUNTS = {}, STYLISTS = [];
 
-// ── Init: load data from JSON ──────────────────────────────────────────
 function initDirectory(data) {
   TAG_LABELS = data.tag_labels;
   CITIES = data.cities;
   STYLE_COUNTS = data.style_counts;
   STYLISTS = data.stylists;
 
-  const cityPillsEl = document.getElementById('cityPills');
+  var cityPillsEl = document.getElementById('cityPills');
   if (cityPillsEl) {
     cityPillsEl.innerHTML = '';
     CITIES.forEach(function(city) {
-      const b = document.createElement('button');
+      var b = document.createElement('button');
       b.className = 'city-pill';
       b.textContent = city;
+      b.setAttribute('aria-pressed', aC.has(city) ? 'true' : 'false');
       if (aC.has(city)) b.classList.add('on');
       b.addEventListener('click', function() {
-        if (aC.has(city)) { aC.delete(city); b.classList.remove('on'); }
-        else { aC.add(city); b.classList.add('on'); }
+        if (aC.has(city)) { aC.delete(city); b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
+        else { aC.add(city); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); }
         render();
       });
       cityPillsEl.appendChild(b);
     });
   }
 
-  const styleListEl = document.getElementById('styleList');
+  var styleListEl = document.getElementById('styleList');
   if (styleListEl) {
     styleListEl.innerHTML = '';
-    Object.entries(TAG_LABELS).forEach(function(entry) {
-      const k = entry[0], v = entry[1];
-      const d = document.createElement('div');
+    Object.keys(TAG_LABELS).forEach(function(k) {
+      var v = TAG_LABELS[k];
+      var d = document.createElement('div');
       d.className = 'style-item';
       d.dataset.k = k;
+      d.setAttribute('role', 'checkbox');
+      d.setAttribute('aria-checked', aS.has(k) ? 'true' : 'false');
+      d.setAttribute('tabindex', '0');
       if (aS.has(k)) d.classList.add('on');
       d.innerHTML = '<span class="style-item-name">' + BM.esc(v) + '</span>' +
         '<span class="style-item-count">' + (STYLE_COUNTS[k] || 0) + '</span>';
-      d.addEventListener('click', function() {
-        if (aS.has(k)) { aS.delete(k); d.classList.remove('on'); }
-        else { aS.add(k); d.classList.add('on'); }
+
+      function toggle() {
+        if (aS.has(k)) { aS.delete(k); d.classList.remove('on'); d.setAttribute('aria-checked', 'false'); }
+        else { aS.add(k); d.classList.add('on'); d.setAttribute('aria-checked', 'true'); }
         render();
+      }
+      d.addEventListener('click', toggle);
+      d.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
       });
       styleListEl.appendChild(d);
     });
   }
 
-  const el = document.getElementById('resultNum');
+  var el = document.getElementById('resultNum');
   if (el) el.textContent = STYLISTS.length;
 
   // Parse URL params
-  const p = new URLSearchParams(window.location.search);
-  const style = p.get('style'), city = p.get('city'), qp = p.get('q');
+  var p = new URLSearchParams(window.location.search);
+  var style = p.get('style'), city = p.get('city'), qp = p.get('q');
   if (style) {
     aS.add(style);
-    document.querySelectorAll('.style-item').forEach(function(d) { if (d.dataset.k === style) d.classList.add('on'); });
+    document.querySelectorAll('.style-item').forEach(function(d) { if (d.dataset.k === style) { d.classList.add('on'); d.setAttribute('aria-checked', 'true'); } });
   }
   if (city) {
     aC.add(city);
-    document.querySelectorAll('.city-pill').forEach(function(b) { if (b.textContent.trim() === city) b.classList.add('on'); });
+    document.querySelectorAll('.city-pill').forEach(function(b) { if (b.textContent.trim() === city) { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); } });
   }
   if (qp) {
-    const v = decodeURIComponent(qp);
-    const si = document.getElementById('searchInput');
+    var v = decodeURIComponent(qp);
+    var si = document.getElementById('searchInput');
     if (si) si.value = v;
     q = v.toLowerCase();
   }
 }
 
-
-
 BM.renderNav();
 
 // GATE
-function showGate(){ document.getElementById('gateOverlay').classList.add('show'); }
-function hideGate(){ document.getElementById('gateOverlay').classList.remove('show'); }
+function showGate() { document.getElementById('gateOverlay').classList.add('show'); }
+function hideGate() { document.getElementById('gateOverlay').classList.remove('show'); }
 
-document.getElementById('gateForm').addEventListener('submit', function(e){
+document.getElementById('gateForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  const name = document.getElementById('gateName').value.trim();
-  const email = document.getElementById('gateEmail').value.trim();
-  if(!name||!email) return;
-  const fd = new FormData();
-  fd.append('form-name','braidmap-signup'); fd.append('name',name); fd.append('email',email);
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
-  BM.login(name,email);
+  var name = document.getElementById('gateName').value.trim();
+  var email = document.getElementById('gateEmail').value.trim();
+  if (!name || !email) return;
+  var fd = new FormData();
+  fd.append('form-name', 'braidmap-signup');
+  fd.append('name', name);
+  fd.append('email', email);
+  fetch('/', { method: 'POST', body: fd }).catch(function() {});
+  BM.login(name, email);
   hideGate();
   BM.renderNav();
   render();
 });
 
-const KEYWORD_MAP = {"box braids": "BraidsGeneral", "knotless": "BraidsGeneral", "knotless braids": "BraidsGeneral", "boho braids": "BraidsGeneral", "goddess braids": "BraidsGeneral", "fulani braids": "BraidsGeneral", "jumbo braids": "BraidsGeneral", "micro braids": "BraidsGeneral", "tribal braids": "BraidsGeneral", "bob braids": "BraidsGeneral", "feed-in braids": "BraidsGeneral", "stitch braids": "BraidsGeneral", "butterfly braids": "BraidsGeneral", "braids": "BraidsGeneral", "french curl": "BraidsGeneral", "pick and drop": "BraidsGeneral", "dread cornrows": "BraidsOnDreadlock", "dread twists": "BraidsOnDreadlock", "braids on locs": "BraidsOnDreadlock", "in-between braids": "BraidsOnDreadlock", "braids on dreadlocks": "BraidsOnDreadlock", "cornrows": "Cornrows", "cornrow": "Cornrows", "ghana braids": "Cornrows", "ghana weaving": "Cornrows", "feed-in cornrows": "Cornrows", "shuku": "Cornrows", "invisible cornrows": "Cornrows", "twists": "Twists", "senegalese twists": "Twists", "passion twists": "Twists", "spring twists": "Twists", "kinky twists": "Twists", "marley twists": "Twists", "two strand twists": "Twists", "mini twists": "Twists", "rope twists": "Twists", "barrel twists": "Twists", "locs": "Locs", "dreadlocks": "Locs", "dreads": "Locs", "starter locs": "Locs", "microlocs": "Locs", "sisterlocs": "Locs", "freeform locs": "Locs", "loc extensions": "Locs", "instant locs": "Locs", "loc installation": "Locs", "retwist": "LocsRetwist", "loc retwist": "LocsRetwist", "loc maintenance": "LocsRetwist", "dreadlock maintenance": "LocsRetwist", "retightening": "LocsRetwist", "interloc": "LocsRetwist", "sew-in": "Installs", "sew in": "Installs", "weave": "Installs", "extensions": "Installs", "k-tips": "Installs", "tape-ins": "Installs", "tape ins": "Installs", "microlinks": "Installs", "i-tips": "Installs", "nano beads": "Installs", "beaded weft": "Installs", "bonding": "Installs", "wig install": "Wigs", "wig installs": "Wigs", "lace front": "Wigs", "frontal": "Wigs", "closure": "Wigs", "glueless": "Wigs", "custom wig": "CustomWigs", "wig making": "CustomWigs", "hand tied": "CustomWigs", "bespoke wig": "CustomWigs", "wig wash": "WigMaintenance", "wig styling": "WigMaintenance", "wig care": "WigMaintenance", "wig maintenance": "WigMaintenance", "wig revamp": "WigRevamp", "wig restoration": "WigRevamp", "wig repair": "WigRevamp", "wig makeover": "WigRevamp", "crochet": "CrochetInstalls", "faux locs": "CrochetInstalls", "soft locs": "CrochetInstalls", "butterfly locs": "CrochetInstalls", "boho locs": "CrochetInstalls", "goddess locs": "CrochetInstalls", "distressed locs": "CrochetInstalls", "men's braids": "MensBraids", "mens braids": "MensBraids", "men's cornrows": "MensBraids", "male braids": "MensBraids", "barber braids": "MensBraids", "kids braids": "KidsBraids", "children's braids": "KidsBraids", "kids cornrows": "KidsBraids", "kids twists": "KidsBraids", "girls braids": "KidsBraids", "boys braids": "KidsBraids", "takedown": "BraidTakeDown", "take down": "BraidTakeDown", "braid removal": "BraidTakeDown", "extension removal": "BraidTakeDown", "unbraiding": "BraidTakeDown", "wash and blow dry": "WashBlowDry", "blowout": "WashBlowDry", "blow dry": "WashBlowDry", "wash and go": "WashBlowDry", "wash & go": "WashBlowDry", "detangle": "WashBlowDry", "hair wash": "WashBlowDry", "shampoo": "WashBlowDry", "relaxer": "Relaxer", "texturizer": "Relaxer", "perm": "Relaxer", "keratin": "Relaxer", "chemical straightening": "Relaxer", "colour": "Colouring", "color": "Colouring", "highlights": "Colouring", "balayage": "Colouring", "ombre": "Colouring", "hair dye": "Colouring", "colour correction": "Colouring", "color correction": "Colouring", "root touch up": "Colouring", "vivid color": "Colouring", "ponytail": "Ponytails", "sleek ponytail": "Ponytails", "knotless ponytail": "Ponytails", "weave ponytail": "Ponytails", "bridal": "Bridals", "wedding hair": "Bridals", "wedding braids": "Bridals", "bridal updo": "Bridals", "event hair": "Bridals", "formal hair": "Bridals", "silk press": "SilkPress", "flat iron": "SilkPress", "press and curl": "SilkPress", "thermal press": "SilkPress", "silk blowout": "SilkPress", "natural hair": "NaturalHairCare", "scalp care": "NaturalHairCare", "deep conditioning": "NaturalHairCare", "protein treatment": "NaturalHairCare", "curl care": "NaturalHairCare", "4c hair": "NaturalHairCare", "afro hair": "NaturalHairCare", "coily hair": "NaturalHairCare", "natural hair care": "NaturalHairCare"};
+var KEYWORD_MAP = {"box braids":"BraidsGeneral","knotless":"BraidsGeneral","knotless braids":"BraidsGeneral","boho braids":"BraidsGeneral","goddess braids":"BraidsGeneral","fulani braids":"BraidsGeneral","jumbo braids":"BraidsGeneral","micro braids":"BraidsGeneral","tribal braids":"BraidsGeneral","bob braids":"BraidsGeneral","feed-in braids":"BraidsGeneral","stitch braids":"BraidsGeneral","butterfly braids":"BraidsGeneral","braids":"BraidsGeneral","french curl":"BraidsGeneral","pick and drop":"BraidsGeneral","dread cornrows":"BraidsOnDreadlock","dread twists":"BraidsOnDreadlock","braids on locs":"BraidsOnDreadlock","in-between braids":"BraidsOnDreadlock","braids on dreadlocks":"BraidsOnDreadlock","cornrows":"Cornrows","cornrow":"Cornrows","ghana braids":"Cornrows","ghana weaving":"Cornrows","feed-in cornrows":"Cornrows","shuku":"Cornrows","invisible cornrows":"Cornrows","twists":"Twists","senegalese twists":"Twists","passion twists":"Twists","spring twists":"Twists","kinky twists":"Twists","marley twists":"Twists","two strand twists":"Twists","mini twists":"Twists","rope twists":"Twists","barrel twists":"Twists","locs":"Locs","dreadlocks":"Locs","dreads":"Locs","starter locs":"Locs","microlocs":"Locs","sisterlocs":"Locs","freeform locs":"Locs","loc extensions":"Locs","instant locs":"Locs","loc installation":"Locs","retwist":"LocsRetwist","loc retwist":"LocsRetwist","loc maintenance":"LocsRetwist","dreadlock maintenance":"LocsRetwist","retightening":"LocsRetwist","interloc":"LocsRetwist","sew-in":"Installs","sew in":"Installs","weave":"Installs","extensions":"Installs","k-tips":"Installs","tape-ins":"Installs","tape ins":"Installs","microlinks":"Installs","i-tips":"Installs","nano beads":"Installs","beaded weft":"Installs","bonding":"Installs","wig install":"Wigs","wig installs":"Wigs","lace front":"Wigs","frontal":"Wigs","closure":"Wigs","glueless":"Wigs","custom wig":"CustomWigs","wig making":"CustomWigs","hand tied":"CustomWigs","bespoke wig":"CustomWigs","wig wash":"WigMaintenance","wig styling":"WigMaintenance","wig care":"WigMaintenance","wig maintenance":"WigMaintenance","wig revamp":"WigRevamp","wig restoration":"WigRevamp","wig repair":"WigRevamp","wig makeover":"WigRevamp","crochet":"CrochetInstalls","faux locs":"CrochetInstalls","soft locs":"CrochetInstalls","butterfly locs":"CrochetInstalls","boho locs":"CrochetInstalls","goddess locs":"CrochetInstalls","distressed locs":"CrochetInstalls","men's braids":"MensBraids","mens braids":"MensBraids","men's cornrows":"MensBraids","male braids":"MensBraids","barber braids":"MensBraids","kids braids":"KidsBraids","children's braids":"KidsBraids","kids cornrows":"KidsBraids","kids twists":"KidsBraids","girls braids":"KidsBraids","boys braids":"KidsBraids","takedown":"BraidTakeDown","take down":"BraidTakeDown","braid removal":"BraidTakeDown","extension removal":"BraidTakeDown","unbraiding":"BraidTakeDown","wash and blow dry":"WashBlowDry","blowout":"WashBlowDry","blow dry":"WashBlowDry","wash and go":"WashBlowDry","wash & go":"WashBlowDry","detangle":"WashBlowDry","hair wash":"WashBlowDry","shampoo":"WashBlowDry","relaxer":"Relaxer","texturizer":"Relaxer","perm":"Relaxer","keratin":"Relaxer","chemical straightening":"Relaxer","colour":"Colouring","color":"Colouring","highlights":"Colouring","balayage":"Colouring","ombre":"Colouring","hair dye":"Colouring","colour correction":"Colouring","color correction":"Colouring","root touch up":"Colouring","vivid color":"Colouring","ponytail":"Ponytails","sleek ponytail":"Ponytails","knotless ponytail":"Ponytails","weave ponytail":"Ponytails","bridal":"Bridals","wedding hair":"Bridals","wedding braids":"Bridals","bridal updo":"Bridals","event hair":"Bridals","formal hair":"Bridals","silk press":"SilkPress","flat iron":"SilkPress","press and curl":"SilkPress","thermal press":"SilkPress","silk blowout":"SilkPress","natural hair":"NaturalHairCare","scalp care":"NaturalHairCare","deep conditioning":"NaturalHairCare","protein treatment":"NaturalHairCare","curl care":"NaturalHairCare","4c hair":"NaturalHairCare","afro hair":"NaturalHairCare","coily hair":"NaturalHairCare","natural hair care":"NaturalHairCare"};
 
 // FILTER STATE
-let aC = new Set(), aS = new Set(), q = '', sortBy = 'count';
+var aC = new Set(), aS = new Set(), q = '', sortBy = 'count';
 
-// (city pills built inside initDirectory)
-
-// (style list built inside initDirectory)
-
-document.getElementById('searchInput').oninput = e => { q = e.target.value.toLowerCase(); render(); };
-document.getElementById('sortSelect').onchange = e => { sortBy = e.target.value; render(); };
-document.getElementById('clearBtn').onclick = () => {
+document.getElementById('searchInput').addEventListener('input', BM.utils.debounce(function(e) { q = e.target.value.toLowerCase(); render(); }, 120));
+document.getElementById('sortSelect').addEventListener('change', function(e) { sortBy = e.target.value; render(); });
+document.getElementById('clearBtn').addEventListener('click', function() {
   aC = new Set(); aS = new Set(); q = '';
   document.getElementById('searchInput').value = '';
-  document.querySelectorAll('.city-pill,.style-item').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.city-pill').forEach(function(x) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+  document.querySelectorAll('.style-item').forEach(function(x) { x.classList.remove('on'); x.setAttribute('aria-checked', 'false'); });
   render();
-};
+});
 
-function ini(n){ return (n.replace(/[^a-zA-Z]/g,'')[0]||'B').toUpperCase(); }
+function ini(n) { return (n.replace(/[^a-zA-Z]/g, '')[0] || 'B').toUpperCase(); }
 
-function render(){
-  // Keyword search — find matching tag from keyword map
-  let keywordTag = null;
-  if(q) {
-    const qLower = q.toLowerCase().trim();
-    // Exact keyword match
-    if(KEYWORD_MAP[qLower]) keywordTag = KEYWORD_MAP[qLower];
+function render() {
+  var keywordTag = null;
+  if (q) {
+    var qLower = q.toLowerCase().trim();
+    if (KEYWORD_MAP[qLower]) keywordTag = KEYWORD_MAP[qLower];
     else {
-      // Partial match — find first keyword that starts with or includes q
-      const match = Object.keys(KEYWORD_MAP).find(k => k.includes(qLower) || qLower.includes(k));
-      if(match) keywordTag = KEYWORD_MAP[match];
+      var match = Object.keys(KEYWORD_MAP).find(function(k) { return k.includes(qLower) || qLower.includes(k); });
+      if (match) keywordTag = KEYWORD_MAP[match];
     }
   }
 
-  let list = STYLISTS.filter(s =>
-    (aC.size===0 || aC.has(s.city)) &&
-    (aS.size===0 || s.tags.some(t => aS.has(t))) &&
-    (!q || s.name.toLowerCase().includes(q) ||
-      (keywordTag && s.tags.includes(keywordTag)) ||
-      s.tags.some(t => (TAG_LABELS[t]||'').toLowerCase().includes(q))
-    )
-  );
-  if(sortBy==='name') list.sort((a,b) => a.name.localeCompare(b.name));
-  else if(sortBy==='city') list.sort((a,b) => a.city.localeCompare(b.city));
+  var list = STYLISTS.filter(function(s) {
+    return (aC.size === 0 || aC.has(s.city)) &&
+      (aS.size === 0 || s.tags.some(function(t) { return aS.has(t); })) &&
+      (!q || s.name.toLowerCase().includes(q) ||
+        (keywordTag && s.tags.includes(keywordTag)) ||
+        s.tags.some(function(t) { return (TAG_LABELS[t] || '').toLowerCase().includes(q); })
+      );
+  });
+
+  if (sortBy === 'name') list.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  else if (sortBy === 'city') list.sort(function(a, b) { return a.city.localeCompare(b.city); });
 
   document.getElementById('resultNum').textContent = list.length;
-  const parts = [];
-  if(aC.size) parts.push([...aC].join(', '));
-  if(aS.size) parts.push([...aS].map(k => TAG_LABELS[k]).join(', '));
-  if(q) parts.push(`"${q}"`);
+  var parts = [];
+  if (aC.size) parts.push(Array.from(aC).join(', '));
+  if (aS.size) parts.push(Array.from(aS).map(function(k) { return TAG_LABELS[k]; }).join(', '));
+  if (q) parts.push('"' + q + '"');
   document.getElementById('filterStatus').textContent = parts.length ? parts.join(' · ') : 'All stylists';
 
-  const wrap = document.getElementById('cardsWrap');
-  const signedUp = BM.isLoggedIn();
-  const visible = signedUp ? list : list.slice(0, FREE_LIMIT);
+  var wrap = document.getElementById('cardsWrap');
+  var signedUp = BM.isLoggedIn();
+  var visible = signedUp ? list : list.slice(0, FREE_LIMIT);
 
-  if(!list.length){
-    // Build a descriptive message based on what was searched
-  let searchContext = '';
-  if(aC.size) searchContext = [...aC].join(' or ') + ' yet';
-  else if(aS.size) searchContext = [...aS].map(k=>TAG_LABELS[k]).join(' or ') + ' yet';
-  else if(q) searchContext = `"${q}" yet`;
-  else searchContext = 'this search yet';
+  if (!list.length) {
+    var searchContext = '';
+    if (aC.size) searchContext = Array.from(aC).join(' or ') + ' yet';
+    else if (aS.size) searchContext = Array.from(aS).map(function(k) { return TAG_LABELS[k]; }).join(' or ') + ' yet';
+    else if (q) searchContext = '"' + q + '" yet';
+    else searchContext = 'this search yet';
 
-  wrap.innerHTML = `<div class="cards-grid"><div class="no-results">
-    <span class="no-results-icon">🔍</span>
-    <h3>Still <em>hunting</em> for you</h3>
-    <p>We don't have any BIPOC hairstylists listed for ${searchContext} — but we're always growing. Help us find the best stylists in BC!</p>
-    <a href="braidmap-suggest.html" class="no-results-link">Suggest a stylist →</a>
-  </div></div>`;
-  return;
+    wrap.innerHTML = '<div class="cards-grid"><div class="no-results">' +
+      '<span class="no-results-icon" aria-hidden="true">🔍</span>' +
+      '<h3>Still <em>hunting</em> for you</h3>' +
+      '<p>We don\'t have any BIPOC hairstylists listed for ' + BM.esc(searchContext) + ' — but we\'re always growing. Help us find the best stylists in BC!</p>' +
+      '<a href="braidmap-suggest.html" class="no-results-link">Suggest a stylist →</a>' +
+      '</div></div>';
+    return;
   }
 
-  const cardsHtml = visible.map(s => {
-    const tags = s.tags.slice(0,3);
-    const extra = s.tags.length - 3;
-    const tagsHtml = tags.map(t =>
-      `<span class="card-tag${aS.has(t)?' active-tag':''}">${TAG_LABELS[t]||t}</span>`
-    ).join('') + (extra>0 ? `<span class="card-tag">+${extra}</span>` : '');
+  var cardsHtml = visible.map(function(s) {
+    var tags = s.tags.slice(0, 3);
+    var extra = s.tags.length - 3;
+    var tagsHtml = tags.map(function(t) {
+      return '<span class="card-tag' + (aS.has(t) ? ' active-tag' : '') + '">' + BM.esc(TAG_LABELS[t] || t) + '</span>';
+    }).join('') + (extra > 0 ? '<span class="card-tag">+' + extra + '</span>' : '');
 
-    const hasBook = BM.isValidBookingUrl(s.booking);
-    const safeBook = hasBook ? BM.safeBookingUrl(s.booking) : '';
-    const bookBtn = hasBook
-      ? `<a href="${BM.escAttr(safeBook)}" target="_blank" rel="noopener noreferrer" class="btn-book" onclick="event.stopPropagation()">Book →</a>`
-      : `<span class="btn-book btn-dm">DM to book</span>`;
+    var hasBook = BM.isValidBookingUrl(s.booking);
+    var safeBook = hasBook ? BM.safeBookingUrl(s.booking) : '';
+    var bookBtn = hasBook
+      ? '<a href="' + BM.escAttr(safeBook) + '" target="_blank" rel="noopener noreferrer" class="btn-book-card" onclick="event.stopPropagation()">Book →</a>'
+      : '<span class="btn-book-card btn-dm">DM to book</span>';
+    var dep = s.deposit ? '<div class="card-deposit"><div class="card-deposit-dot"></div> Deposit</div>' : '';
 
-    const dep = s.deposit ? `<div class="card-deposit"><div class="card-deposit-dot"></div> Deposit</div>` : '';
-
-    return `<a href="braidmap-profile.html?id=${s.id}" class="card">
-      <div class="card-head">
-        <div class="card-av">${ini(s.name)}</div>
-        <span class="card-city-badge">${BM.esc(s.city||'BC')}</span>
-      </div>
-      <div class="card-name">${BM.esc(s.name)}</div>
-      <div class="card-handle">@${BM.esc(s.ig||'—')}</div>
-      <div class="card-tags">${tagsHtml}</div>
-      <div class="card-footer">
-        <div class="card-count"><strong>${s.count}</strong> services</div>
-        <div class="card-actions">${dep}${bookBtn}</div>
-      </div>
-    </a>`;
+    var profileUrl = 'braidmap-profile.html?id=' + BM.escAttr(s.id);
+    return '<div class="card" data-href="' + profileUrl + '" role="link" tabindex="0">' +
+      '<a class="card-body" href="' + profileUrl + '">' +
+      '<div class="card-head">' +
+      '<div class="card-av">' + ini(s.name) + '</div>' +
+      '<span class="card-city-badge">' + BM.esc(s.city || 'BC') + '</span>' +
+      '</div>' +
+      '<div class="card-name">' + BM.esc(s.name) + '</div>' +
+      '<div class="card-handle">@' + BM.esc(s.ig || '—') + '</div>' +
+      '<div class="card-tags">' + tagsHtml + '</div>' +
+      '</a>' +
+      '<div class="card-footer">' +
+      '<div class="card-count"><strong>' + s.count + '</strong> services</div>' +
+      '<div class="card-actions">' + dep + bookBtn + '</div>' +
+      '</div></div>';
   }).join('');
 
-  if(!signedUp && list.length > FREE_LIMIT){
-    wrap.innerHTML = `
-      <div class="lock-wrap">
-        <div class="cards-grid">${cardsHtml}</div>
-        <div class="lock-fade"></div>
-      </div>
-      <div class="lock-banner">
-        <span class="lock-icon">🔒</span>
-        <div class="lock-title">Sign up to see all ${list.length} stylists</div>
-        <p class="lock-sub">You're seeing ${FREE_LIMIT} of ${list.length} stylists.<br>Sign up free to unlock the full directory.</p>
-        <button class="lock-btn" id="lockBtn">Unlock Full Directory →</button>
-      </div>`;
+  if (!signedUp && list.length > FREE_LIMIT) {
+    wrap.innerHTML = '<div class="lock-wrap">' +
+      '<div class="cards-grid">' + cardsHtml + '</div>' +
+      '<div class="lock-fade"></div>' +
+      '</div>' +
+      '<div class="lock-banner">' +
+      '<span class="lock-icon" aria-hidden="true">🔒</span>' +
+      '<div class="lock-title">Sign up to see all ' + list.length + ' stylists</div>' +
+      '<p class="lock-sub">You\'re seeing ' + FREE_LIMIT + ' of ' + list.length + ' stylists.<br>Sign up free to unlock the full directory.</p>' +
+      '<button class="lock-btn" id="lockBtn">Unlock Full Directory →</button>' +
+      '</div>';
+    var lockBtn = document.getElementById('lockBtn');
+    if (lockBtn) lockBtn.addEventListener('click', showGate);
   } else {
-    wrap.innerHTML = `<div class="cards-grid">${cardsHtml}</div>`;
+    wrap.innerHTML = '<div class="cards-grid">' + cardsHtml + '</div>';
   }
+
+  // Wire whole-card click for navigation (since card is now a div, not <a>)
+  wrap.querySelectorAll('.card[data-href]').forEach(function(card) {
+    card.addEventListener('click', function(e) {
+      // Don't navigate if a link or button inside the footer was clicked
+      if (e.target.closest('a, button')) return;
+      window.location.href = card.dataset.href;
+    });
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        window.location.href = card.dataset.href;
+      }
+    });
+  });
 }
 
-// (URL params parsed in initDirectory)
-
-// Mobile filter
-document.getElementById('mobileFilterBtn').addEventListener('click', () => {
-  const sb = document.getElementById('sidebar');
-  sb.classList.toggle('open');
-  document.getElementById('mobileFilterBtn').textContent = sb.classList.contains('open') ? '✕ Close' : '⊞ Filters';
+// Mobile filter toggle
+document.getElementById('mobileFilterBtn').addEventListener('click', function() {
+  var sb = document.getElementById('sidebar');
+  var btn = document.getElementById('mobileFilterBtn');
+  var isOpen = sb.classList.toggle('open');
+  btn.textContent = isOpen ? '✕ Close Filters' : '⊞ Filters';
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
 
-// ── Load data and initialise ──────────────────────────────────────────────
-fetch('braidmap_data.json')
-  .then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
+// Load data and initialise (hardened: timeout + retry + cache via BM.data)
+BM.loadStylists()
   .then(function(data) {
     initDirectory(data);
     BM.renderNav();
     render();
   })
   .catch(function(err) {
-    console.error('BraidMap: failed to load data', err);
+    BM.log.error('directory: failed to load data', err);
     var w = document.getElementById('cardsWrap');
     if (w) w.innerHTML = '<div class="no-results">' +
-      '<span class="no-results-icon">⚠️</span>' +
+      '<span class="no-results-icon" aria-hidden="true">⚠️</span>' +
       '<h3>Unable to load <em>stylists</em></h3>' +
       '<p>Please refresh the page to try again.</p></div>';
+    var fs = document.getElementById('filterStatus');
+    if (fs) fs.textContent = 'Error loading data';
     BM.renderNav();
   });
 </script>

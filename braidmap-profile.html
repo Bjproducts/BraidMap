@@ -3,411 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="View stylist profile on BraidMap — services, booking, and contact info.">
+<meta property="og:title" content="Stylist Profile — BraidMap">
+<meta property="og:description" content="View services, booking info, and contact details for this BIPOC hairstylist.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
 <title>Stylist Profile — BraidMap</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/braidmap.css">
 <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/log.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/data.js"></script>
+<script src="js/core/nav.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
-:root{--black:#0A0A0A;--white:#FAFAFA;--g100:#F2F2F2;--g200:#E0E0E0;--g400:#A0A0A0;--g600:#555}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--white);color:var(--black);font-family:'Manrope',sans-serif;overflow-x:hidden;}
+/* ── Page-specific: Profile ── */
 
+/* Hero overrides */
+.back-link { position: relative; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.3); text-decoration: none; margin-bottom: 48px; transition: color 0.15s; }
+.back-link:hover { color: rgba(255,255,255,.7); }
+.hero-inner { display: grid; grid-template-columns: auto 1fr auto; gap: 40px; align-items: end; position: relative; }
+.hero-avatar { width: 96px; height: 96px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 42px; font-style: italic; color: white; flex-shrink: 0; }
+.hero-city { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 10px; }
+.hero-name { font-family: var(--font-serif); font-size: 52px; font-weight: 400; letter-spacing: -2px; line-height: 1; color: white; margin-bottom: 8px; }
+.hero-handle { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,.35); }
+.hero-cta { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+.btn-book { display: inline-flex; align-items: center; gap: 8px; background: white; color: var(--black); padding: 14px 28px; border-radius: 7px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
+.btn-book:hover { opacity: .88; }
+.btn-dm { background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.1); font-weight: 400; }
+.dep-badge { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.25); display: flex; align-items: center; gap: 5px; }
+.dep-dot { width: 5px; height: 5px; background: rgba(255,255,255,.4); border-radius: 50%; }
 
+/* Body layout */
+.body-wrap { display: grid; grid-template-columns: 1fr 340px; border-bottom: 1px solid var(--g200); }
+.main { padding: 56px 80px; border-right: 1px solid var(--g200); }
+.sec-label { margin-bottom: 20px; }
+.sec-title { margin-bottom: 28px; }
 
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--g200)}
-.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px;color:var(--black);display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-m{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:14px;font-style:italic;font-family:'Instrument Serif',serif}
-.nav-l{display:flex;align-items:center;gap:36px;list-style:none}
-.nav-l a{font-size:13px;color:var(--g600);text-decoration:none;transition:color .15s}
-.nav-l a:hover{color:var(--black)}
-.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--black);border-radius:2px}
-.nav-mobile-menu{display:none;position:fixed;top:65px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--g200);padding:16px 24px 20px;flex-direction:column;gap:4px;z-index:199}
-.nav-mobile-menu.open{display:flex}
-.nav-mobile-menu a{font-size:15px;color:var(--g600);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--g100)}
-.nav-mobile-menu a:last-child{border-bottom:none}
+/* Stats */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--g200); border-radius: 10px; overflow: hidden; margin-bottom: 48px; }
+.stat-box { padding: 24px 28px; border-right: 1px solid var(--g200); }
+.stat-box:last-child { border-right: none; }
+.stat-num { font-family: var(--font-serif); font-size: 32px; color: var(--black); letter-spacing: -1px; display: block; line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--g400); font-family: var(--font-mono); }
 
-/* HERO */
-.hero{background:var(--black);padding:120px 80px 72px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px}
-.back-link{position:relative;display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;margin-bottom:48px;transition:color .15s;}
-.back-link:hover{color:rgba(255,255,255,.7)}
-.hero-inner{display:grid;grid-template-columns:auto 1fr auto;gap:40px;align-items:end;position:relative}
-.hero-avatar{width:96px;height:96px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:42px;font-style:italic;color:white;flex-shrink:0}
-.hero-city{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px}
-.hero-name{font-family:'Instrument Serif',serif;font-size:52px;font-weight:400;letter-spacing:-2px;line-height:1;color:white;margin-bottom:8px}
-.hero-handle{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.35)}
-.hero-cta{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-.btn-book{display:inline-flex;align-items:center;gap:8px;background:white;color:var(--black);padding:14px 28px;border-radius:7px;font-size:14px;font-weight:600;text-decoration:none;transition:opacity .15s;white-space:nowrap}
-.btn-book:hover{opacity:.88}
-.btn-dm{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1);font-weight:400}
-.dep-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:5px}
-.dep-dot{width:5px;height:5px;background:rgba(255,255,255,.4);border-radius:50%}
+/* Tags grid */
+.tags-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 48px; }
+.tag-chip { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--g200); background: var(--white); font-size: 13px; color: var(--g600); font-weight: 400; }
+.tag-chip.featured { background: var(--black); border-color: var(--black); color: white; font-weight: 500; }
+.tag-chip::before { content: "✓"; font-size: 11px; opacity: .5; flex-shrink: 0; }
+.tag-chip.featured::before { opacity: .7; }
 
-/* BODY */
-.body-wrap{display:grid;grid-template-columns:1fr 340px;border-bottom:1px solid var(--g200)}
-.main{padding:56px 80px;border-right:1px solid var(--g200)}
-.sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--g400);margin-bottom:20px;display:block}
-.sec-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;letter-spacing:-1.5px;color:var(--black);margin-bottom:28px}
-.sec-title em{font-style:italic;color:var(--g400)}
+/* Aside */
+.aside { padding: 48px 36px; }
+.aside-sec { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--g200); }
+.aside-sec:last-child { border-bottom: none; margin-bottom: 0; }
+.aside-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--g400); margin-bottom: 14px; display: block; }
+.soc-links { display: flex; flex-direction: column; gap: 8px; }
+.soc-link { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid var(--g200); border-radius: 7px; text-decoration: none; color: var(--g600); font-size: 13px; transition: all 0.15s; }
+.soc-link:hover { border-color: var(--black); color: var(--black); background: var(--g100); }
+.soc-link-handle { font-family: var(--font-mono); font-size: 10px; color: var(--g400); margin-left: auto; }
+.contact-rows { display: flex; flex-direction: column; gap: 10px; }
+.contact-row { display: flex; align-items: center; gap: 10px; }
+.contact-row svg { flex-shrink: 0; color: var(--g400); }
+.contact-text { font-size: 13px; color: var(--g600); }
+.contact-text a { color: var(--g600); text-decoration: none; }
+.contact-text a:hover { color: var(--black); }
+.book-btn { display: block; width: 100%; padding: 13px; background: var(--black); color: white; border-radius: 7px; text-align: center; text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity 0.15s; margin-bottom: 8px; }
+.book-btn:hover { opacity: .85; }
+.book-btn.secondary { background: var(--g100); color: var(--g600); font-weight: 400; font-size: 13px; }
+.book-btn.secondary:hover { background: var(--g200); }
+.deposit-note { font-family: var(--font-mono); font-size: 10px; color: var(--g400); margin-top: 10px; line-height: 1.6; }
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--g200);border-radius:10px;overflow:hidden;margin-bottom:48px}
-.stat-box{padding:24px 28px;border-right:1px solid var(--g200)}
-.stat-box:last-child{border-right:none}
-.stat-num{font-family:'Instrument Serif',serif;font-size:32px;color:var(--black);letter-spacing:-1px;display:block;line-height:1;margin-bottom:4px}
-.stat-label{font-size:11px;color:var(--g400);font-family:'DM Mono',monospace}
+/* Related */
+.related { padding: 56px 80px; background: var(--g100); border-top: 1px solid var(--g200); }
+.related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+.rel-card { background: var(--white); border: 1px solid var(--g200); border-radius: 8px; padding: 18px; text-decoration: none; transition: all 0.2s; display: block; }
+.rel-card:hover { border-color: var(--g400); transform: translateY(-2px); }
+.rel-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.rel-av { width: 36px; height: 36px; background: var(--black); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 14px; font-style: italic; color: white; }
+.rel-city { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); }
+.rel-name { font-family: var(--font-serif); font-size: 15px; color: var(--black); margin-bottom: 3px; letter-spacing: -.3px; }
+.rel-tags { font-family: var(--font-mono); font-size: 10px; color: var(--g400); line-height: 1.5; }
 
-.tags-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:48px}
-.tag-chip{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:8px;border:1px solid var(--g200);background:var(--white);font-size:13px;color:var(--g600);font-weight:400}
-.tag-chip.featured{background:var(--black);border-color:var(--black);color:white;font-weight:500}
-.tag-chip::before{content:"✓";font-size:11px;opacity:.5;flex-shrink:0}
-.tag-chip.featured::before{content:"✓";opacity:.7}
+/* Actions cards */
+.actions-section { padding: 48px 80px; border-top: 1px solid var(--g200); background: var(--g100); }
+.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 800px; }
+.action-card { background: white; border: 1px solid var(--g200); border-radius: 12px; padding: 28px; }
+.action-card-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--g400); margin-bottom: 10px; }
+.action-card-title { font-family: var(--font-serif); font-size: 20px; letter-spacing: -.5px; color: var(--black); margin-bottom: 8px; }
+.action-card p { font-size: 13px; color: var(--g600); line-height: 1.7; font-weight: 300; margin-bottom: 16px; }
 
-/* ASIDE */
-.aside{padding:48px 36px}
-.aside-sec{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--g200)}
-.aside-sec:last-child{border-bottom:none;margin-bottom:0}
-.aside-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:14px;display:block}
+/* Not found */
+.not-found { padding: 160px 80px; text-align: center; }
+.not-found h2 { font-family: var(--font-serif); font-size: 48px; color: var(--g200); margin-bottom: 12px; letter-spacing: -2px; }
+.not-found p { color: var(--g400); margin-bottom: 24px; }
+.not-found a { color: var(--black); font-weight: 500; }
 
-.soc-links{display:flex;flex-direction:column;gap:8px}
-.soc-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--g200);border-radius:7px;text-decoration:none;color:var(--g600);font-size:13px;transition:all .15s;}
-.soc-link:hover{border-color:var(--black);color:var(--black);background:var(--g100)}
-.soc-link-handle{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);margin-left:auto}
-
-.contact-rows{display:flex;flex-direction:column;gap:10px}
-.contact-row{display:flex;align-items:center;gap:10px}
-.contact-row svg{flex-shrink:0;color:var(--g400)}
-.contact-text{font-size:13px;color:var(--g600)}
-.contact-text a{color:var(--g600);text-decoration:none}
-.contact-text a:hover{color:var(--black)}
-
-.book-btn{display:block;width:100%;padding:13px;background:var(--black);color:white;border-radius:7px;text-align:center;text-decoration:none;font-size:14px;font-weight:600;transition:opacity .15s;margin-bottom:8px}
-.book-btn:hover{opacity:.85}
-.book-btn.secondary{background:var(--g100);color:var(--g600);font-weight:400;font-size:13px}
-.book-btn.secondary:hover{background:var(--g200)}
-.deposit-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);margin-top:10px;line-height:1.6}
-
-/* RELATED */
-.related{padding:56px 80px;background:var(--g100);border-top:1px solid var(--g200)}
-.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
-.rel-card{background:var(--white);border:1px solid var(--g200);border-radius:8px;padding:18px;text-decoration:none;transition:all .2s;display:block}
-.rel-card:hover{border-color:var(--g400);transform:translateY(-2px)}
-.rel-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.rel-av{width:36px;height:36px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:14px;font-style:italic;color:white}
-.rel-city{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g400)}
-.rel-name{font-family:'Instrument Serif',serif;font-size:15px;color:var(--black);margin-bottom:3px;letter-spacing:-.3px}
-.rel-tags{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);line-height:1.5}
-
-/* GATE */
-.gate-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,10,10,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-.gate-overlay.show{opacity:1;pointer-events:all}
-.gate-modal{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:48px;max-width:440px;width:90%;position:relative;transform:translateY(20px);transition:transform .3s}
-.gate-overlay.show .gate-modal{transform:translateY(0)}
-.gate-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:14px;display:block}
-.gate-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;letter-spacing:-1.5px;line-height:1.05;color:var(--black);margin-bottom:10px}
-.gate-title em{font-style:italic;color:var(--g400)}
-.gate-sub{font-size:13px;color:var(--g600);line-height:1.7;font-weight:300;margin-bottom:28px}
-.gate-form{display:flex;flex-direction:column;gap:10px}
-.gate-input{width:100%;padding:12px 16px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border-color .15s}
-.gate-input:focus{border-color:var(--black)}
-.gate-input::placeholder{color:var(--g400)}
-.gate-submit{width:100%;padding:13px;background:var(--black);color:white;border:none;border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;transition:opacity .15s;margin-top:4px}
-.gate-submit:hover{opacity:.85}
-.gate-note{font-size:11px;color:var(--g400);text-align:center;margin-top:12px;line-height:1.6}
-.gate-note a{color:var(--black);font-weight:600}
-
-/* NOT FOUND */
-.not-found{padding:160px 80px;text-align:center}
-.not-found h2{font-family:'Instrument Serif',serif;font-size:48px;color:var(--g200);margin-bottom:12px;letter-spacing:-2px}
-.not-found p{color:var(--g400);margin-bottom:24px}
-.not-found a{color:var(--black);font-weight:500}
-
-/* MOBILE */
-@media(max-width:768px){
-  nav{padding:16px 24px}
-  .nav-l{display:none!important}
-  .nav-hamburger{display:flex}
-  .hero{padding:90px 24px 48px}
-  .hero-inner{grid-template-columns:1fr;gap:20px}
-  .hero-name{font-size:36px;letter-spacing:-1.5px}
-  .hero-cta{align-items:flex-start}
-  .btn-book{width:100%;justify-content:center}
-  .body-wrap{grid-template-columns:1fr}
-  .main{padding:36px 24px;border-right:none;border-bottom:1px solid var(--g200)}
-  .aside{padding:32px 24px}
-  .stats-row{grid-template-columns:1fr}
-  .stat-box{border-right:none!important;border-bottom:1px solid var(--g200)}
-  .stat-box:last-child{border-bottom:none}
-  .sec-title{font-size:28px}
-  .related{padding:36px 24px}
-  .related-grid{grid-template-columns:1fr;gap:10px}
-  .gate-modal{padding:32px 24px}
-  .gate-title{font-size:28px}
+@media (max-width: 1024px) {
+  .body-wrap { grid-template-columns: 1fr 280px; }
+  .main { padding: 40px 48px; }
+  .related { padding: 40px 48px; }
+  .actions-section { padding: 40px 48px; }
 }
-
-  /* MODALS */
-  .modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(10,10,10,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-  .modal-overlay.show{opacity:1;pointer-events:all}
-  .modal-box{background:white;border-radius:16px;padding:40px;max-width:480px;width:90%;position:relative;transform:translateY(20px);transition:transform .3s;max-height:90vh;overflow-y:auto}
-  .modal-overlay.show .modal-box{transform:translateY(0)}
-  .modal-close{position:absolute;top:16px;right:18px;font-size:22px;color:var(--g400);background:none;border:none;cursor:pointer;line-height:1;transition:color .15s}
-  .modal-close:hover{color:var(--black)}
-  .modal-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:12px;display:block}
-  .modal-title{font-family:'Instrument Serif',serif;font-size:30px;font-weight:400;letter-spacing:-1px;color:var(--black);margin-bottom:8px}
-  .modal-title em{font-style:italic;color:var(--g400)}
-  .modal-sub{font-size:13px;color:var(--g600);line-height:1.7;font-weight:300;margin-bottom:24px}
-  .modal-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-  .modal-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g600)}
-  .modal-input{padding:11px 14px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);outline:none;transition:border-color .15s;width:100%;background:white}
-  .modal-input:focus{border-color:var(--black)}
-  .modal-input::placeholder{color:var(--g400)}
-  textarea.modal-input{resize:vertical;min-height:90px;line-height:1.6}
-  select.modal-input{cursor:pointer}
-  .modal-submit{width:100%;padding:13px;background:var(--black);color:white;border:none;border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:8px}
-  .modal-submit:hover{opacity:.85}
-  .modal-success{text-align:center;padding:20px 0}
-  .modal-success-icon{font-size:40px;margin-bottom:12px;display:block}
-  .modal-success-title{font-family:'Instrument Serif',serif;font-size:26px;color:var(--black);margin-bottom:8px}
-  .modal-success-sub{font-size:13px;color:var(--g600);line-height:1.7}
-
+@media (max-width: 768px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 20px; }
+  .hero-name { font-size: 36px; letter-spacing: -1.5px; }
+  .hero-cta { align-items: flex-start; }
+  .btn-book { width: 100%; justify-content: center; }
+  .body-wrap { grid-template-columns: 1fr; }
+  .main { padding: 36px 24px; border-right: none; border-bottom: 1px solid var(--g200); }
+  .aside { padding: 32px 24px; }
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-box { border-right: none !important; border-bottom: 1px solid var(--g200); }
+  .stat-box:last-child { border-bottom: none; }
+  .tags-grid { grid-template-columns: 1fr; }
+  .related { padding: 36px 24px; }
+  .related-grid { grid-template-columns: 1fr; gap: 10px; }
+  .actions-section { padding: 36px 24px; }
+  .actions-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<!-- Netlify form -->
+<a href="#app" class="skip-link">Skip to content</a>
+
+<!-- Netlify forms -->
 <form name="braidmap-signup" netlify netlify-honeypot="bot-field" hidden>
   <input name="name"><input name="email">
 </form>
-
-<!-- Gate -->
-<div class="gate-overlay" id="gateOverlay">
-  <div class="gate-modal">
-    <span class="gate-eyebrow">Join BraidMap</span>
-    <h2 class="gate-title">Sign up to see<br><em>full profiles</em></h2>
-    <p class="gate-sub">Create a free account to view services, contact info and book with any stylist.</p>
-    <form class="gate-form" id="gateForm">
-      <input class="gate-input" id="gateName" name="name" type="text" placeholder="Your name" required>
-      <input class="gate-input" id="gateEmail" name="email" type="email" placeholder="Your email address" required>
-      <button class="gate-submit" type="submit">Sign Up Free →</button>
-    </form>
-    <p class="gate-note">Free forever. No spam.<br>Already have an account? <a href="braidmap-auth.html?tab=login">Log in here</a></p>
-  </div>
-</div>
-
-<nav>
-  <a href="index.html" class="logo"><div class="logo-m">B</div>BraidMap</a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="braidmap-directory.html">Find a Stylist</a></li>
-  </ul>
-  <span id="navRight"></span>
-  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  <div class="nav-mobile-menu" id="mobileMenu">
-    <a href="braidmap-directory.html">Find a Stylist</a>
-  </div>
-</nav>
-
-<div id="app"></div>
-
-<script>
-
-// Auth
-// addRecent moved to BM.addRecent
-
-
-
-let STYLISTS = [], TAG_LABELS = {};
-
-// Gate
-function showGate(){ document.getElementById('gateOverlay').classList.add('show'); }
-function hideGate(){ document.getElementById('gateOverlay').classList.remove('show'); }
-
-document.getElementById('gateForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const name=document.getElementById('gateName').value.trim();
-  const email=document.getElementById('gateEmail').value.trim();
-  if(!name||!email) return;
-  const fd=new FormData(); fd.append('form-name','braidmap-signup'); fd.append('name',name); fd.append('email',email);
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
-  BM.login(name,email);
-  hideGate();
-  BM.renderNav();
-  render();
-});
-
-let currentStylist = null;
-
-function ini(n){ return (n.replace(/[^a-zA-Z]/g,'')[0]||'B').toUpperCase(); }
-
-const ICONS = {
-  ig: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>`,
-  tk: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.05a8.16 8.16 0 0 0 4.78 1.52V7.12a4.85 4.85 0 0 1-1.01-.43Z"/></svg>`,
-  fb: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.49h-2.79V24C19.62 23.1 24 18.1 24 12.07z"/></svg>`,
-  ph: `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.1 6.1l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>`,
-  pin:`<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>`,
-};
-
-function getStyled(){
-  const params=new URLSearchParams(window.location.search);
-  const pid=params.get('id');
-  return pid ? STYLISTS.find(s=>s.id===pid) : STYLISTS[0];
-}
-
-function getRelated(s){
-  return STYLISTS
-    .filter(x=>x.id!==s.id&&(x.city===s.city||x.tags.some(t=>s.tags.includes(t))))
-    .sort((a,b)=>{
-      const aScore=(a.city===s.city?3:0)+a.tags.filter(t=>s.tags.includes(t)).length;
-      const bScore=(b.city===s.city?3:0)+b.tags.filter(t=>s.tags.includes(t)).length;
-      return bScore-aScore;
-    }).slice(0,3);
-}
-
-function render(){
-  const s=getStyled();
-  const app=document.getElementById('app');
-
-  if(!s){
-    app.innerHTML=`<div class="not-found"><h2>Stylist not found</h2><p>This profile doesn't exist.</p><a href="braidmap-directory.html">← Back to directory</a></div>`;
-    return;
-  }
-
-  // Track recently viewed
-  if(BM.isLoggedIn()) BM.addRecent(s.id);
-
-  const hasBook = BM.isValidBookingUrl(s.booking);
-  const safeBook = hasBook ? BM.safeBookingUrl(s.booking) : '';
-  const bookBtn=hasBook
-    ?`<a href="${BM.escAttr(safeBook)}" target="_blank" rel="noopener noreferrer" class="btn-book">Book Appointment</a>`
-    :`<span class="btn-book btn-dm">DM to Book</span>`;
-  const depBadge=s.deposit?`<div class="dep-badge"><div class="dep-dot"></div> Deposit required</div>`:'';
-
-  // Tags
-  const tagsHtml=s.tags.map((t,i)=>`<div class="tag-chip${i<3?' featured':''}">${TAG_LABELS[t]||t}</div>`).join('');
-
-  // Socials
-  let socials='';
-  if(s.ig_url) socials+=`<a href="${s.ig_url}" target="_blank" class="soc-link">${ICONS.ig}<span>Instagram</span><span class="soc-link-handle">@${s.ig}</span></a>`;
-  if(s.tiktok) socials+=`<a href="${s.tiktok}" target="_blank" class="soc-link">${ICONS.tk}<span>TikTok</span>${s.tiktok_u?`<span class="soc-link-handle">@${s.tiktok_u}</span>`:''}</a>`;
-  if(s.facebook) socials+=`<a href="${s.facebook}" target="_blank" class="soc-link">${ICONS.fb}<span>Facebook</span></a>`;
-
-  // Contact
-  let contact='';
-  if(s.phone) contact+=`<div class="contact-row">${ICONS.ph}<div class="contact-text"><a href="tel:${s.phone}">${s.phone}</a></div></div>`;
-
-  // Location
-  const locHtml=s.maps_url
-    ?`<div class="contact-row">${ICONS.pin}<div class="contact-text"><a href="${s.maps_url}" target="_blank">${s.city||'BC'}, BC — View on Maps ↗</a></div></div>`
-    :`<div class="contact-row">${ICONS.pin}<div class="contact-text">${s.city||'BC'}, BC</div></div>`;
-
-  // Related
-  const related=getRelated(s);
-  const relHtml=related.map(r=>`
-    <a href="braidmap-profile.html?id=${r.id}" class="rel-card">
-      <div class="rel-top"><div class="rel-av">${ini(r.name)}</div><span class="rel-city">${r.city}</span></div>
-      <div class="rel-name">${r.name}</div>
-      <div class="rel-tags">${r.tags.slice(0,3).map(t=>TAG_LABELS[t]).join(' · ')}</div>
-    </a>`).join('');
-
-  // Gate blur if not signed up
-  const gateBlur = !BM.isLoggedIn() ? 'style="filter:blur(4px);pointer-events:none;user-select:none;"' : '';
-  const gateBanner = !BM.isLoggedIn() ? `
-    <div style="position:relative;z-index:10;text-align:center;padding:32px 24px;background:rgba(250,250,250,0.95);border-top:1px solid var(--g200);margin-top:-2px;">
-      <div style="font-size:24px;margin-bottom:10px;">🔒</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:24px;letter-spacing:-0.5px;margin-bottom:8px;">Sign up to view full profile</div>
-      <p style="font-size:13px;color:var(--g600);font-weight:300;margin-bottom:18px;">Create a free account to see services, contact info and book.</p>
-      <button onclick="showGate()" style="background:var(--black);color:white;border:none;padding:12px 28px;border-radius:7px;font-size:14px;font-weight:600;font-family:'Manrope',sans-serif;">Sign Up Free →</button>
-    </div>` : '';
-
-  document.title = `${s.name} — BraidMap`;
-
-  app.innerHTML = `
-    <div class="hero">
-      <a href="braidmap-directory.html" class="back-link">← Back to directory</a>
-      <div class="hero-inner">
-        <div class="hero-avatar">${ini(s.name)}</div>
-        <div>
-          <div class="hero-city">📍 ${s.city||'British Columbia'}</div>
-          <h1 class="hero-name">${s.name}</h1>
-          <div class="hero-handle">@${s.ig||'—'}</div>
-        </div>
-        <div class="hero-cta">${bookBtn}${depBadge}</div>
-      </div>
-    </div>
-
-    <div ${!BM.isLoggedIn()?'style="position:relative;"':''}>
-      <div class="body-wrap" ${gateBlur}>
-        <div class="main">
-          <div class="stats-row">
-            <div class="stat-box"><span class="stat-num">${s.count}</span><span class="stat-label">Services offered</span></div>
-            <div class="stat-box"><span class="stat-num">${s.city||'BC'}</span><span class="stat-label">Location</span></div>
-            <div class="stat-box"><span class="stat-num">${s.deposit?'Required':'Not required'}</span><span class="stat-label">Deposit</span></div>
-          </div>
-          <span class="sec-label">Services offered</span>
-          <h2 class="sec-title">What <em>${s.name}</em> does</h2>
-          <div class="tags-grid">${tagsHtml}</div>
-        </div>
-        <div class="aside">
-          <div class="aside-sec">
-            <span class="aside-label">Location</span>
-            <div class="contact-rows">${locHtml}</div>
-          </div>
-          ${contact?`<div class="aside-sec"><span class="aside-label">Phone</span><div class="contact-rows">${contact}</div></div>`:''}
-          ${socials?`<div class="aside-sec"><span class="aside-label">Social Media</span><div class="soc-links">${socials}</div></div>`:''}
-          <div class="aside-sec">
-            <span class="aside-label">Book an Appointment</span>
-            ${hasBook?`<a href="${BM.escAttr(safeBook)}" target="_blank" rel="noopener noreferrer" class="book-btn">Book Now →</a>`:`<span class="book-btn secondary">DM on Instagram to book</span>`}
-            ${s.ig_url?`<a href="${s.ig_url}" target="_blank" class="book-btn secondary">Open Instagram →</a>`:''}
-            ${s.deposit?`<p class="deposit-note">⚠ This stylist requires a deposit to confirm your booking.</p>`:''}
-          </div>
-        </div>
-      </div>
-      ${gateBanner}
-    </div>
-
-    <div style="padding:48px 80px;border-top:1px solid var(--g200);background:var(--g100);">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px;">
-      <div style="background:white;border:1px solid var(--g200);border-radius:12px;padding:28px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:10px;">Business Owner?</div>
-        <div style="font-family:'Instrument Serif',serif;font-size:20px;letter-spacing:-.5px;color:var(--black);margin-bottom:8px;">Claim this profile</div>
-        <p style="font-size:13px;color:var(--g600);line-height:1.7;font-weight:300;margin-bottom:16px;">Are you the owner of this business? Fill in the form below to verify and take control of your listing.</p>
-        <button onclick="requireLogin('claim')" style="display:inline-flex;align-items:center;gap:6px;background:var(--black);color:white;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Manrope',sans-serif;">Claim Profile →</button>
-      </div>
-      <div style="background:white;border:1px solid var(--g200);border-radius:12px;padding:28px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g400);margin-bottom:10px;">Incorrect Info?</div>
-        <div style="font-family:'Instrument Serif',serif;font-size:20px;letter-spacing:-.5px;color:var(--black);margin-bottom:8px;">Report an issue</div>
-        <p style="font-size:13px;color:var(--g600);line-height:1.7;font-weight:300;margin-bottom:16px;">Noticed something wrong — closed business, wrong number, or outdated info? Let us know.</p>
-        <a href="javascript:void(0)" onclick="BM.isLoggedIn()?window.location.href='braidmap-report.html?business='+encodeURIComponent(s.name):window.location.href='braidmap-auth.html'" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--g200);color:var(--g600);padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;background:var(--g100);border:1px solid var(--g200);font-family:'Manrope',sans-serif;text-decoration:none;">Report Issue →</a>
-      </div>
-    </div>
-  </div>
-
-  ${related.length?`<div class="related"><span class="sec-label">You might also like</span><h2 class="sec-title">Similar <em>stylists</em></h2><div class="related-grid">${relHtml}</div></div>`:''}
-  `;
-}
-
-// ── Load data and render ──────────────────────────────────────────────────
-fetch('braidmap_data.json')
-  .then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
-  .then(function(data) {
-    STYLISTS   = data.stylists;
-    TAG_LABELS = data.tag_labels;
-    BM.renderNav();
-    render();
-  })
-  .catch(function(err) {
-    console.error('BraidMap: failed to load data', err);
-    var app = document.getElementById('app');
-    if (app) app.innerHTML = '<div class="not-found"><h2>Unable to load profile</h2>' +
-      '<p>Please refresh the page.</p>' +
-      '<a href="braidmap-directory.html">← Back to directory</a></div>';
-    BM.renderNav();
-  });
-</script>
-
-<!-- Netlify hidden forms -->
 <form name="braidmap-claim" netlify netlify-honeypot="bot-field" hidden>
   <input name="business_id"><input name="business_name">
   <input name="your_name"><input name="your_email"><input name="your_phone">
@@ -419,34 +148,67 @@ fetch('braidmap_data.json')
   <select name="issue_type"></select><textarea name="details"></textarea>
 </form>
 
+<!-- Gate -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-modal">
+    <span class="gate-eyebrow">Join BraidMap</span>
+    <h2 class="gate-title">Sign up to see<br><em>full profiles</em></h2>
+    <p class="gate-sub">Create a free account to view services, contact info and book with any stylist.</p>
+    <form class="gate-form" id="gateForm">
+      <input class="gate-input" id="gateName" name="name" type="text" placeholder="Your name" required autocomplete="name">
+      <input class="gate-input" id="gateEmail" name="email" type="email" placeholder="Your email address" required autocomplete="email">
+      <button class="gate-submit" type="submit">Sign Up Free →</button>
+    </form>
+    <p class="gate-note">Free forever. No spam.<br>Already have an account? <a href="braidmap-auth.html?tab=login">Log in here</a></p>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">B</div>BraidMap</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="braidmap-directory.html">Find a Stylist</a></li>
+  </ul>
+  <span id="navRight"></span>
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  <div class="nav-mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile menu">
+    <a href="braidmap-directory.html">Find a Stylist</a>
+  </div>
+</nav>
+
+<main id="app" role="main">
+  <div class="loading-state" aria-live="polite">
+    <span class="loading-state-text">Loading profile...</span>
+  </div>
+</main>
+
 <!-- CLAIM MODAL -->
 <div class="modal-overlay" id="claimModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('claim')">×</button>
+    <button class="modal-close" id="claimModalClose" aria-label="Close">×</button>
     <div id="claimForm">
       <span class="modal-ey">Business Owner</span>
       <h2 class="modal-title">Claim <em>this profile</em></h2>
       <p class="modal-sub">Fill in your details and we'll reach out to verify your ownership within 3–5 business days.</p>
       <div class="modal-group">
-        <label class="modal-label">Your Name</label>
+        <label class="modal-label" for="claim_name">Your Name</label>
         <input class="modal-input" id="claim_name" type="text" placeholder="Your full name">
       </div>
       <div class="modal-group">
-        <label class="modal-label">Your Email</label>
+        <label class="modal-label" for="claim_email">Your Email</label>
         <input class="modal-input" id="claim_email" type="email" placeholder="your@email.com">
       </div>
       <div class="modal-group">
-        <label class="modal-label">Your Phone (optional)</label>
+        <label class="modal-label" for="claim_phone">Your Phone (optional)</label>
         <input class="modal-input" id="claim_phone" type="tel" placeholder="604 000 0000">
       </div>
       <div class="modal-group">
-        <label class="modal-label">Message (optional)</label>
+        <label class="modal-label" for="claim_message">Message (optional)</label>
         <textarea class="modal-input" id="claim_message" placeholder="Any additional info to help us verify..."></textarea>
       </div>
-      <button class="modal-submit" onclick="submitClaim()">Submit Claim →</button>
+      <button class="modal-submit" id="claimSubmitBtn">Submit Claim →</button>
     </div>
     <div class="modal-success" id="claimSuccess" style="display:none">
-      <span class="modal-success-icon">✅</span>
+      <span class="modal-success-icon" aria-hidden="true">✅</span>
       <div class="modal-success-title">Request received!</div>
       <p class="modal-success-sub">We'll review your claim and get back to you within 3–5 business days.</p>
     </div>
@@ -456,13 +218,13 @@ fetch('braidmap_data.json')
 <!-- REPORT MODAL -->
 <div class="modal-overlay" id="reportModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('report')">×</button>
+    <button class="modal-close" id="reportModalClose" aria-label="Close">×</button>
     <div id="reportForm">
       <span class="modal-ey">Report an Issue</span>
       <h2 class="modal-title">What's <em>wrong?</em></h2>
       <p class="modal-sub">Help us keep BraidMap accurate. We'll review your report and update the listing if needed.</p>
       <div class="modal-group">
-        <label class="modal-label">Issue Type</label>
+        <label class="modal-label" for="report_type">Issue Type</label>
         <select class="modal-input" id="report_type">
           <option value="">Select an issue...</option>
           <option>Business is permanently closed</option>
@@ -476,21 +238,21 @@ fetch('braidmap_data.json')
         </select>
       </div>
       <div class="modal-group">
-        <label class="modal-label">Your Name</label>
+        <label class="modal-label" for="report_name">Your Name</label>
         <input class="modal-input" id="report_name" type="text" placeholder="Your full name">
       </div>
       <div class="modal-group">
-        <label class="modal-label">Your Email</label>
+        <label class="modal-label" for="report_email">Your Email</label>
         <input class="modal-input" id="report_email" type="email" placeholder="your@email.com">
       </div>
       <div class="modal-group">
-        <label class="modal-label">Details</label>
+        <label class="modal-label" for="report_details">Details</label>
         <textarea class="modal-input" id="report_details" placeholder="Tell us more about the issue..."></textarea>
       </div>
-      <button class="modal-submit" onclick="submitReport()">Submit Report →</button>
+      <button class="modal-submit" id="reportSubmitBtn">Submit Report →</button>
     </div>
     <div class="modal-success" id="reportSuccess" style="display:none">
-      <span class="modal-success-icon">✅</span>
+      <span class="modal-success-icon" aria-hidden="true">✅</span>
       <div class="modal-success-title">Report received!</div>
       <p class="modal-success-sub">Thanks for helping keep BraidMap accurate. We'll review this shortly.</p>
     </div>
@@ -498,64 +260,264 @@ fetch('braidmap_data.json')
 </div>
 
 <script>
+var STYLISTS = [], TAG_LABELS = {};
+var currentStylist = null;
 
-// Require login before opening modal
-function requireLogin(type){
-  if(!BM.isLoggedIn()){
-    // Show gate or redirect to auth
+function showGate() { document.getElementById('gateOverlay').classList.add('show'); }
+function hideGate() { document.getElementById('gateOverlay').classList.remove('show'); }
+
+document.getElementById('gateForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var name = document.getElementById('gateName').value.trim();
+  var email = document.getElementById('gateEmail').value.trim();
+  if (!name || !email) return;
+  var fd = new FormData();
+  fd.append('form-name', 'braidmap-signup');
+  fd.append('name', name);
+  fd.append('email', email);
+  fetch('/', { method: 'POST', body: fd }).catch(function() {});
+  BM.login(name, email);
+  hideGate();
+  BM.renderNav();
+  render();
+});
+
+function ini(n) { return (n.replace(/[^a-zA-Z]/g, '')[0] || 'B').toUpperCase(); }
+
+var ICONS = {
+  ig: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
+  tk: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.05a8.16 8.16 0 0 0 4.78 1.52V7.12a4.85 4.85 0 0 1-1.01-.43Z"/></svg>',
+  fb: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.49h-2.79V24C19.62 23.1 24 18.1 24 12.07z"/></svg>',
+  ph: '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.1 6.1l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>',
+  pin: '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'
+};
+
+function getStyled() {
+  var params = new URLSearchParams(window.location.search);
+  var pid = params.get('id');
+  return pid ? STYLISTS.find(function(s) { return s.id === pid; }) : STYLISTS[0];
+}
+
+function getRelated(s) {
+  return STYLISTS
+    .filter(function(x) { return x.id !== s.id && (x.city === s.city || x.tags.some(function(t) { return s.tags.includes(t); })); })
+    .sort(function(a, b) {
+      var aScore = (a.city === s.city ? 3 : 0) + a.tags.filter(function(t) { return s.tags.includes(t); }).length;
+      var bScore = (b.city === s.city ? 3 : 0) + b.tags.filter(function(t) { return s.tags.includes(t); }).length;
+      return bScore - aScore;
+    }).slice(0, 3);
+}
+
+function render() {
+  var s = getStyled();
+  var app = document.getElementById('app');
+
+  if (!s) {
+    app.innerHTML = '<div class="not-found"><h2>Stylist not found</h2><p>This profile doesn\'t exist.</p><a href="braidmap-directory.html">← Back to directory</a></div>';
+    return;
+  }
+
+  currentStylist = s;
+  if (BM.isLoggedIn()) BM.addRecent(s.id);
+
+  var hasBook = BM.isValidBookingUrl(s.booking);
+  var safeBook = hasBook ? BM.safeBookingUrl(s.booking) : '';
+  var bookBtn = hasBook
+    ? '<a href="' + BM.escAttr(safeBook) + '" target="_blank" rel="noopener noreferrer" class="btn-book">Book Appointment</a>'
+    : '<span class="btn-book btn-dm">DM to Book</span>';
+  var depBadge = s.deposit ? '<div class="dep-badge"><div class="dep-dot"></div> Deposit required</div>' : '';
+
+  var tagsHtml = s.tags.map(function(t, i) { return '<div class="tag-chip' + (i < 3 ? ' featured' : '') + '">' + BM.esc(TAG_LABELS[t] || t) + '</div>'; }).join('');
+
+  var socials = '';
+  if (s.ig_url) socials += '<a href="' + BM.escAttr(s.ig_url) + '" target="_blank" rel="noopener noreferrer" class="soc-link">' + ICONS.ig + '<span>Instagram</span><span class="soc-link-handle">@' + BM.esc(s.ig) + '</span></a>';
+  if (s.tiktok) socials += '<a href="' + BM.escAttr(s.tiktok) + '" target="_blank" rel="noopener noreferrer" class="soc-link">' + ICONS.tk + '<span>TikTok</span>' + (s.tiktok_u ? '<span class="soc-link-handle">@' + BM.esc(s.tiktok_u) + '</span>' : '') + '</a>';
+  if (s.facebook) socials += '<a href="' + BM.escAttr(s.facebook) + '" target="_blank" rel="noopener noreferrer" class="soc-link">' + ICONS.fb + '<span>Facebook</span></a>';
+
+  var contact = '';
+  if (s.phone) contact += '<div class="contact-row">' + ICONS.ph + '<div class="contact-text"><a href="tel:' + BM.escAttr(s.phone) + '">' + BM.esc(s.phone) + '</a></div></div>';
+
+  var locHtml = s.maps_url
+    ? '<div class="contact-row">' + ICONS.pin + '<div class="contact-text"><a href="' + BM.escAttr(s.maps_url) + '" target="_blank" rel="noopener noreferrer">' + BM.esc(s.city || 'BC') + ', BC — View on Maps ↗</a></div></div>'
+    : '<div class="contact-row">' + ICONS.pin + '<div class="contact-text">' + BM.esc(s.city || 'BC') + ', BC</div></div>';
+
+  var related = getRelated(s);
+  var relHtml = related.map(function(r) {
+    return '<a href="braidmap-profile.html?id=' + BM.escAttr(r.id) + '" class="rel-card">' +
+      '<div class="rel-top"><div class="rel-av">' + ini(r.name) + '</div><span class="rel-city">' + BM.esc(r.city) + '</span></div>' +
+      '<div class="rel-name">' + BM.esc(r.name) + '</div>' +
+      '<div class="rel-tags">' + r.tags.slice(0, 3).map(function(t) { return BM.esc(TAG_LABELS[t] || t); }).join(' · ') + '</div>' +
+      '</a>';
+  }).join('');
+
+  var gateBlur = !BM.isLoggedIn() ? ' style="filter:blur(4px);pointer-events:none;user-select:none;"' : '';
+  var gateBanner = !BM.isLoggedIn()
+    ? '<div style="position:relative;z-index:10;text-align:center;padding:32px 24px;background:rgba(250,250,250,0.95);border-top:1px solid var(--g200);margin-top:-2px;">' +
+      '<div style="font-size:24px;margin-bottom:10px;" aria-hidden="true">🔒</div>' +
+      '<div style="font-family:var(--font-serif);font-size:24px;letter-spacing:-0.5px;margin-bottom:8px;">Sign up to view full profile</div>' +
+      '<p style="font-size:13px;color:var(--g600);font-weight:300;margin-bottom:18px;">Create a free account to see services, contact info and book.</p>' +
+      '<button id="gateBtn" style="background:var(--black);color:white;border:none;padding:12px 28px;border-radius:7px;font-size:14px;font-weight:600;font-family:var(--font-sans);cursor:pointer;">Sign Up Free →</button>' +
+      '</div>'
+    : '';
+
+  document.title = BM.esc(s.name) + ' — BraidMap';
+
+  app.innerHTML =
+    '<div class="hero">' +
+    '<a href="braidmap-directory.html" class="back-link">← Back to directory</a>' +
+    '<div class="hero-inner">' +
+    '<div class="hero-avatar">' + ini(s.name) + '</div>' +
+    '<div><div class="hero-city">📍 ' + BM.esc(s.city || 'British Columbia') + '</div>' +
+    '<h1 class="hero-name">' + BM.esc(s.name) + '</h1>' +
+    '<div class="hero-handle">@' + BM.esc(s.ig || '—') + '</div></div>' +
+    '<div class="hero-cta">' + bookBtn + depBadge + '</div>' +
+    '</div></div>' +
+
+    '<div' + (!BM.isLoggedIn() ? ' style="position:relative;"' : '') + '>' +
+    '<div class="body-wrap"' + gateBlur + '>' +
+    '<div class="main">' +
+    '<div class="stats-row">' +
+    '<div class="stat-box"><span class="stat-num">' + s.count + '</span><span class="stat-label">Services offered</span></div>' +
+    '<div class="stat-box"><span class="stat-num">' + BM.esc(s.city || 'BC') + '</span><span class="stat-label">Location</span></div>' +
+    '<div class="stat-box"><span class="stat-num">' + (s.deposit ? 'Required' : 'Not required') + '</span><span class="stat-label">Deposit</span></div>' +
+    '</div>' +
+    '<span class="sec-label">Services offered</span>' +
+    '<h2 class="sec-title">What <em>' + BM.esc(s.name) + '</em> does</h2>' +
+    '<div class="tags-grid">' + tagsHtml + '</div>' +
+    '</div>' +
+    '<div class="aside">' +
+    '<div class="aside-sec"><span class="aside-label">Location</span><div class="contact-rows">' + locHtml + '</div></div>' +
+    (contact ? '<div class="aside-sec"><span class="aside-label">Phone</span><div class="contact-rows">' + contact + '</div></div>' : '') +
+    (socials ? '<div class="aside-sec"><span class="aside-label">Social Media</span><div class="soc-links">' + socials + '</div></div>' : '') +
+    '<div class="aside-sec"><span class="aside-label">Book an Appointment</span>' +
+    (hasBook ? '<a href="' + BM.escAttr(safeBook) + '" target="_blank" rel="noopener noreferrer" class="book-btn">Book Now →</a>' : '<span class="book-btn secondary">DM on Instagram to book</span>') +
+    (s.ig_url ? '<a href="' + BM.escAttr(s.ig_url) + '" target="_blank" rel="noopener noreferrer" class="book-btn secondary">Open Instagram →</a>' : '') +
+    (s.deposit ? '<p class="deposit-note">⚠ This stylist requires a deposit to confirm your booking.</p>' : '') +
+    '</div></div></div>' +
+    gateBanner + '</div>' +
+
+    '<div class="actions-section"><div class="actions-grid">' +
+    '<div class="action-card">' +
+    '<div class="action-card-label">Business Owner?</div>' +
+    '<div class="action-card-title">Claim this profile</div>' +
+    '<p>Are you the owner of this business? Fill in the form below to verify and take control of your listing.</p>' +
+    '<button class="btn-primary" id="claimBtn" style="padding:10px 20px;font-size:13px;">Claim Profile →</button>' +
+    '</div>' +
+    '<div class="action-card">' +
+    '<div class="action-card-label">Incorrect Info?</div>' +
+    '<div class="action-card-title">Report an issue</div>' +
+    '<p>Noticed something wrong — closed business, wrong number, or outdated info? Let us know.</p>' +
+    '<button class="btn-secondary" id="reportBtn">Report Issue →</button>' +
+    '</div>' +
+    '</div></div>' +
+
+    (related.length ? '<div class="related"><span class="sec-label">You might also like</span><h2 class="sec-title">Similar <em>stylists</em></h2><div class="related-grid">' + relHtml + '</div></div>' : '');
+
+  // Wire dynamic buttons
+  var gateBtn = document.getElementById('gateBtn');
+  if (gateBtn) gateBtn.addEventListener('click', showGate);
+
+  var claimBtn = document.getElementById('claimBtn');
+  if (claimBtn) claimBtn.addEventListener('click', function() { requireLogin('claim'); });
+
+  var reportBtn = document.getElementById('reportBtn');
+  if (reportBtn) reportBtn.addEventListener('click', function() {
+    if (BM.isLoggedIn()) {
+      window.location.href = 'braidmap-report.html?business=' + encodeURIComponent(s.name);
+    } else {
+      window.location.href = 'braidmap-auth.html';
+    }
+  });
+}
+
+// Modal helpers
+function requireLogin(type) {
+  if (!BM.isLoggedIn()) {
     window.location.href = 'braidmap-auth.html?redirect=back';
     return;
   }
   openModal(type);
 }
 
-// Modal helpers
-function openModal(type){ document.getElementById(type+'Modal').classList.add('show'); document.body.style.overflow='hidden'; }
-function closeModal(type){ document.getElementById(type+'Modal').classList.remove('show'); document.body.style.overflow=''; }
+function openModal(type) {
+  var el = document.getElementById(type + 'Modal');
+  if (el) { el.classList.add('show'); document.body.style.overflow = 'hidden'; }
+}
+function closeModal(type) {
+  var el = document.getElementById(type + 'Modal');
+  if (el) { el.classList.remove('show'); document.body.style.overflow = ''; }
+}
+
 // Close on overlay click
-document.getElementById('claimModal').addEventListener('click', function(e){ if(e.target===this) closeModal('claim'); });
-document.getElementById('reportModal').addEventListener('click', function(e){ if(e.target===this) closeModal('report'); });
+document.getElementById('claimModal').addEventListener('click', function(e) { if (e.target === this) closeModal('claim'); });
+document.getElementById('reportModal').addEventListener('click', function(e) { if (e.target === this) closeModal('report'); });
+document.getElementById('claimModalClose').addEventListener('click', function() { closeModal('claim'); });
+document.getElementById('reportModalClose').addEventListener('click', function() { closeModal('report'); });
 
-function submitClaim(){
-  const name=document.getElementById('claim_name').value.trim();
-  const email=document.getElementById('claim_email').value.trim();
-  if(!name){ alert('Please enter your name.'); return; }
-  if(!email||!email.includes('@')){ alert('Please enter a valid email.'); return; }
-  const s=getStyled();
-  const fd=new FormData();
-  fd.append('form-name','braidmap-claim');
-  fd.append('business_id', s?s.id:'');
-  fd.append('business_name', s?s.name:'');
-  fd.append('your_name',name);
-  fd.append('your_email',email);
-  fd.append('your_phone',document.getElementById('claim_phone').value.trim());
-  fd.append('message',document.getElementById('claim_message').value.trim());
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
-  document.getElementById('claimForm').style.display='none';
-  document.getElementById('claimSuccess').style.display='block';
-}
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal('claim');
+    closeModal('report');
+  }
+});
 
-function submitReport(){
-  const type=document.getElementById('report_type').value;
-  const name=document.getElementById('report_name').value.trim();
-  const email=document.getElementById('report_email').value.trim();
-  if(!type){ alert('Please select an issue type.'); return; }
-  if(!name){ alert('Please enter your name.'); return; }
-  if(!email||!email.includes('@')){ alert('Please enter a valid email.'); return; }
-  const s=getStyled();
-  const fd=new FormData();
-  fd.append('form-name','braidmap-report');
-  fd.append('business_id', s?s.id:'');
-  fd.append('business_name', s?s.name:'');
-  fd.append('issue_type',type);
-  fd.append('your_name',name);
-  fd.append('your_email',email);
-  fd.append('details',document.getElementById('report_details').value.trim());
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
-  document.getElementById('reportForm').style.display='none';
-  document.getElementById('reportSuccess').style.display='block';
-}
+// Claim submit
+document.getElementById('claimSubmitBtn').addEventListener('click', function() {
+  var name = document.getElementById('claim_name').value.trim();
+  var email = document.getElementById('claim_email').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+  var s = getStyled();
+  var fd = new FormData();
+  fd.append('form-name', 'braidmap-claim');
+  fd.append('business_id', s ? s.id : '');
+  fd.append('business_name', s ? s.name : '');
+  fd.append('your_name', name);
+  fd.append('your_email', email);
+  fd.append('your_phone', document.getElementById('claim_phone').value.trim());
+  fd.append('message', document.getElementById('claim_message').value.trim());
+  fetch('/', { method: 'POST', body: fd }).catch(function() {});
+  document.getElementById('claimForm').style.display = 'none';
+  document.getElementById('claimSuccess').style.display = 'block';
+});
 
+// Report submit
+document.getElementById('reportSubmitBtn').addEventListener('click', function() {
+  var type = document.getElementById('report_type').value;
+  var name = document.getElementById('report_name').value.trim();
+  var email = document.getElementById('report_email').value.trim();
+  if (!type) { alert('Please select an issue type.'); return; }
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+  var s = getStyled();
+  var fd = new FormData();
+  fd.append('form-name', 'braidmap-report');
+  fd.append('business_id', s ? s.id : '');
+  fd.append('business_name', s ? s.name : '');
+  fd.append('issue_type', type);
+  fd.append('your_name', name);
+  fd.append('your_email', email);
+  fd.append('details', document.getElementById('report_details').value.trim());
+  fetch('/', { method: 'POST', body: fd }).catch(function() {});
+  document.getElementById('reportForm').style.display = 'none';
+  document.getElementById('reportSuccess').style.display = 'block';
+});
+
+// Load data and render (hardened: timeout + retry + cache via BM.data)
+BM.loadStylists()
+  .then(function(data) {
+    STYLISTS = data.stylists;
+    TAG_LABELS = data.tag_labels;
+    BM.renderNav();
+    render();
+  })
+  .catch(function(err) {
+    BM.log.error('profile: failed to load data', err);
+    var app = document.getElementById('app');
+    if (app) app.innerHTML = '<div class="not-found"><h2>Unable to load profile</h2><p>Please refresh the page.</p><a href="braidmap-directory.html">← Back to directory</a></div>';
+    BM.renderNav();
+  });
 </script>
 </body>
 </html>

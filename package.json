@@ -1,0 +1,19 @@
+{
+  "name": "braidmap",
+  "version": "1.1.0",
+  "private": true,
+  "description": "BraidMap — BC's BIPOC hairstylist directory. Static site, no build step.",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev":   "npx serve -l 3000 .",
+    "serve": "npx serve -l 3000 ."
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "homepage": "https://thebraidmap.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bjproducts/BraidMap"
+  }
+}

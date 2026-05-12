@@ -3,255 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Manage your BraidMap profile, view recently explored stylists, and update your details.">
+<meta property="og:title" content="My Profile — BraidMap">
+<meta property="og:description" content="Manage your BraidMap profile and recently viewed stylists.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
 <title>My Profile — BraidMap</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/braidmap.css">
 <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/log.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/data.js"></script>
+<script src="js/core/nav.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
-:root{--black:#0A0A0A;--white:#FAFAFA;--g100:#F2F2F2;--g200:#E0E0E0;--g400:#A0A0A0;--g600:#555}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--white);color:var(--black);font-family:'Manrope',sans-serif;overflow-x:hidden;}
+/* ── Page-specific: Member Dashboard ── */
+.hero-inner { display: flex; align-items: center; gap: 32px; position: relative; }
+.hero-avatar {
+  width: 80px; height: 80px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 36px; font-style: italic; color: white; flex-shrink: 0;
+}
+.hero-name {
+  font-family: var(--font-serif); font-size: 52px; font-weight: 400;
+  letter-spacing: -2px; color: white; line-height: 1;
+}
+.hero-name em { font-style: italic; color: rgba(255,255,255,.4); }
 
-
-
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--g200)}
-.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px;color:var(--black);display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-m{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:14px;font-style:italic;font-family:'Instrument Serif',serif}
-.nav-l{display:flex;align-items:center;gap:36px;list-style:none}
-.nav-l a{font-size:13px;color:var(--g600);text-decoration:none;transition:color .15s}
-.nav-l a:hover{color:var(--black)}
-
-/* HERO */
-.hero{background:var(--black);padding:120px 80px 72px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px}
-.hero-inner{display:flex;align-items:center;gap:32px;position:relative}
-.hero-avatar{width:80px;height:80px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:36px;font-style:italic;color:white;flex-shrink:0}
-.hero-text{}
-.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px;display:block}
-.hero-name{font-family:'Instrument Serif',serif;font-size:52px;font-weight:400;letter-spacing:-2px;color:white;line-height:1}
-.hero-name em{font-style:italic;color:rgba(255,255,255,.4)}
-
-/* BODY */
-.body{max-width:900px;margin:0 auto;padding:64px 80px}
-
-.section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--g400);margin-bottom:20px;display:block}
-.section-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;letter-spacing:-1.5px;color:var(--black);margin-bottom:28px}
-.section-title em{font-style:italic;color:var(--g400)}
+.body { max-width: 900px; margin: 0 auto; padding: 64px 80px; }
+.section-label { margin-bottom: 20px; }
+.section-title { margin-bottom: 28px; }
 
 /* Edit form */
-.edit-card{border:1px solid var(--g200);border-radius:12px;padding:32px;margin-bottom:48px;background:var(--white)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)}
-.form-input{padding:11px 14px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border-color .15s}
-.form-input:focus{border-color:var(--black)}
-.form-actions{display:flex;align-items:center;gap:12px;margin-top:8px}
-.btn-save{padding:10px 24px;background:var(--black);color:white;border:none;border-radius:6px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;transition:opacity .15s}
-.btn-save:hover{opacity:.85}
-.save-msg{font-size:12px;color:var(--g400);font-family:'DM Mono',monospace;opacity:0;transition:opacity .3s}
-.save-msg.show{opacity:1}
+.edit-card { border: 1px solid var(--g200); border-radius: 12px; padding: 32px; margin-bottom: 48px; background: var(--white); }
+.form-row { margin-bottom: 16px; }
+.form-label { color: var(--g400); }
+.form-actions { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.btn-save { padding: 10px 24px; font-size: 13px; }
+.save-msg { font-size: 12px; color: var(--g400); font-family: var(--font-mono); opacity: 0; transition: opacity 0.3s; }
+.save-msg.show { opacity: 1; }
 
 /* Recently viewed */
-.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
-.rec-card{border:1px solid var(--g200);border-radius:10px;padding:20px;text-decoration:none;transition:all .2s;display:block;background:var(--white)}
-.rec-card:hover{background:var(--g100);border-color:var(--g400);transform:translateY(-2px)}
-.rec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.rec-avatar{width:38px;height:38px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;font-style:italic;color:white}
-.rec-city{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g400)}
-.rec-name{font-family:'Instrument Serif',serif;font-size:16px;color:var(--black);margin-bottom:3px;letter-spacing:-.3px}
-.rec-tags{font-family:'DM Mono',monospace;font-size:10px;color:var(--g400);line-height:1.6}
+.recent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 48px; }
+.rec-card { border: 1px solid var(--g200); border-radius: 10px; padding: 20px; text-decoration: none; transition: all 0.2s; display: block; background: var(--white); }
+.rec-card:hover { background: var(--g100); border-color: var(--g400); transform: translateY(-2px); }
+.rec-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.rec-avatar { width: 38px; height: 38px; background: var(--black); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 15px; font-style: italic; color: white; }
+.rec-city { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); }
+.rec-name { font-family: var(--font-serif); font-size: 16px; color: var(--black); margin-bottom: 3px; letter-spacing: -.3px; }
+.rec-tags { font-family: var(--font-mono); font-size: 10px; color: var(--g400); line-height: 1.6; }
 
 /* Empty state */
-.empty{padding:40px;text-align:center;border:1px dashed var(--g200);border-radius:10px;margin-bottom:48px}
-.empty-title{font-family:'Instrument Serif',serif;font-size:24px;color:var(--g200);margin-bottom:8px}
-.empty-sub{font-size:13px;color:var(--g400);margin-bottom:20px}
-.empty-link{display:inline-flex;align-items:center;gap:6px;background:var(--black);color:white;padding:10px 22px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;transition:opacity .15s}
-.empty-link:hover{opacity:.85}
+.empty { padding: 40px; text-align: center; border: 1px dashed var(--g200); border-radius: 10px; margin-bottom: 48px; }
+.empty-title { font-family: var(--font-serif); font-size: 24px; color: var(--g200); margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: var(--g400); margin-bottom: 20px; }
+.empty-link { display: inline-flex; align-items: center; gap: 6px; background: var(--black); color: white; padding: 10px 22px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: opacity 0.15s; }
+.empty-link:hover { opacity: .85; }
 
 /* Logout */
-.danger-zone{border-top:1px solid var(--g200);padding-top:32px;display:flex;align-items:center;justify-content:space-between}
-.btn-logout{padding:9px 20px;background:none;border:1px solid var(--g200);border-radius:6px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--g400);transition:all .15s}
-.btn-logout:hover{border-color:var(--black);color:var(--black)}
-.danger-label{font-size:12px;color:var(--g400)}
+.danger-zone { border-top: 1px solid var(--g200); padding-top: 32px; display: flex; align-items: center; justify-content: space-between; }
+.btn-logout { padding: 9px 20px; background: none; border: 1px solid var(--g200); border-radius: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--g400); transition: all 0.15s; }
+.btn-logout:hover { border-color: var(--black); color: var(--black); }
+.danger-label { font-size: 12px; color: var(--g400); }
 
 /* Not logged in */
-.not-member{padding:160px 80px;text-align:center}
-.not-member h2{font-family:'Instrument Serif',serif;font-size:48px;color:var(--g200);margin-bottom:12px;letter-spacing:-2px}
-.not-member p{color:var(--g400);margin-bottom:24px;font-size:14px}
-.not-member a{background:var(--black);color:white;padding:12px 28px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:600;}
+.not-member { padding: 160px 80px; text-align: center; }
+.not-member h2 { font-family: var(--font-serif); font-size: 48px; color: var(--g200); margin-bottom: 12px; letter-spacing: -2px; }
+.not-member p { color: var(--g400); margin-bottom: 24px; font-size: 14px; }
+.not-member a { background: var(--black); color: white; padding: 12px 28px; border-radius: 7px; text-decoration: none; font-size: 14px; font-weight: 600; }
 
-/* Mobile */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--black);border-radius:2px}
-.nav-mobile-menu{display:none;position:fixed;top:65px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--g200);padding:16px 24px 20px;flex-direction:column;gap:4px;z-index:99}
-.nav-mobile-menu.open{display:flex}
-.nav-mobile-menu a{font-size:15px;color:var(--g600);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--g100)}
-.nav-mobile-menu a:last-child{border-bottom:none}
-
-@media(max-width:768px){
-  nav{padding:16px 24px}
-  .nav-l{display:none!important}
-  .nav-hamburger{display:flex}
-  .hero{padding:90px 24px 48px}
-  .hero-name{font-size:36px}
-  .body{padding:40px 24px}
-  .form-row{grid-template-columns:1fr}
-  .recent-grid{grid-template-columns:1fr}
+@media (max-width: 1024px) {
+  .body { padding: 48px 48px; }
+  .recent-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .hero-name { font-size: 36px; }
+  .body { padding: 40px 24px; }
+  .recent-grid { grid-template-columns: 1fr; }
+  .not-member { padding: 120px 24px; }
+  .not-member h2 { font-size: 36px; }
 }
 </style>
 </head>
 <body>
+
+<a href="#app" class="skip-link">Skip to content</a>
+
 <nav>
-  <a href="index.html" class="logo"><div class="logo-m">B</div>BraidMap</a>
+  <a href="index.html" class="logo"><div class="logo-mark">B</div>BraidMap</a>
   <ul class="nav-links" id="navLinks">
     <li><a href="braidmap-directory.html">Find a Stylist</a></li>
   </ul>
   <span id="navRight"></span>
-  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  <div class="nav-mobile-menu" id="mobileMenu">
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  <div class="nav-mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile menu">
     <a href="braidmap-directory.html">Find a Stylist</a>
   </div>
 </nav>
 
-<div id="app"></div>
+<main id="app" role="main">
+  <div class="loading-state" aria-live="polite">
+    <span class="loading-state-text">Loading profile...</span>
+  </div>
+</main>
 
 <script>
-
-
 let STYLISTS = [], TAG_LABELS = {};
 
-// ── AUTH ──
+function ini(n) { return (n.replace(/[^a-zA-Z]/g, '')[0] || 'M').toUpperCase(); }
 
-function getRecent(){ try{ return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]'); }catch(e){ return []; } }
-// logout delegated to BM.logout()
-
-function ini(n){ return (n.replace(/[^a-zA-Z]/g,'')[0]||'M').toUpperCase(); }
-
-
-
-function render(){
+function render() {
   const app = document.getElementById('app');
 
-  if(!BM.isLoggedIn()){
-    app.innerHTML = `<div class="not-member">
-      <h2>Not signed up yet</h2>
-      <p>Create a free account to unlock the full BraidMap directory.</p>
-      <a href="index.html">Go to BraidMap →</a>
-    </div>`;
+  if (!BM.isLoggedIn()) {
+    app.innerHTML = '<div class="not-member">' +
+      '<h2>Not signed up yet</h2>' +
+      '<p>Create a free account to unlock the full BraidMap directory.</p>' +
+      '<a href="index.html">Go to BraidMap →</a>' +
+      '</div>';
     return;
   }
 
   const name = BM.getUser().name;
   const email = BM.getUser().email;
   const recent = BM.getRecent();
-  const recentStylists = recent.map(id => STYLISTS.find(s => s.id === id)).filter(Boolean);
+  const recentStylists = recent.map(function(id) { return STYLISTS.find(function(s) { return s.id === id; }); }).filter(Boolean);
 
-  // Recently viewed cards
-  const recentHtml = recentStylists.length
-    ? recentStylists.map(s => `
-        <a href="braidmap-profile.html?id=${s.id}" class="rec-card">
-          <div class="rec-top">
-            <div class="rec-avatar">${ini(s.name)}</div>
-            <span class="rec-city">${s.city||'BC'}</span>
-          </div>
-          <div class="rec-name">${s.name}</div>
-          <div class="rec-tags">${s.tags.slice(0,3).map(t=>TAG_LABELS[t]).join(' · ')}</div>
-        </a>`).join('')
-    : `<div class="empty">
-        <div class="empty-title">Nothing yet</div>
-        <p class="empty-sub">Start browsing and your recently viewed stylists will appear here.</p>
-        <a href="braidmap-directory.html" class="empty-link">Browse Stylists →</a>
-      </div>`;
+  var recentHtml = recentStylists.length
+    ? recentStylists.map(function(s) {
+        return '<a href="braidmap-profile.html?id=' + BM.escAttr(s.id) + '" class="rec-card">' +
+          '<div class="rec-top">' +
+          '<div class="rec-avatar">' + ini(s.name) + '</div>' +
+          '<span class="rec-city">' + BM.esc(s.city || 'BC') + '</span>' +
+          '</div>' +
+          '<div class="rec-name">' + BM.esc(s.name) + '</div>' +
+          '<div class="rec-tags">' + s.tags.slice(0, 3).map(function(t) { return BM.esc(TAG_LABELS[t] || t); }).join(' · ') + '</div>' +
+          '</a>';
+      }).join('')
+    : '<div class="empty">' +
+      '<div class="empty-title">Nothing yet</div>' +
+      '<p class="empty-sub">Start browsing and your recently viewed stylists will appear here.</p>' +
+      '<a href="braidmap-directory.html" class="empty-link">Browse Stylists →</a>' +
+      '</div>';
 
-  app.innerHTML = `
-    <div class="hero">
-      <div class="hero-inner">
-        <div class="hero-avatar">${ini(name||'Member')}</div>
-        <div class="hero-text">
-          <span class="hero-eyebrow">Member Profile</span>
-          <h1 class="hero-name">Hey, <em>${name.split(' ')[0] || 'there'}</em></h1>
-        </div>
-      </div>
-    </div>
+  app.innerHTML =
+    '<div class="hero">' +
+    '  <div class="hero-inner">' +
+    '    <div class="hero-avatar">' + ini(name || 'Member') + '</div>' +
+    '    <div class="hero-text">' +
+    '      <span class="hero-eyebrow">Member Profile</span>' +
+    '      <h1 class="hero-name">Hey, <em id="heroFirstName"></em></h1>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>' +
+    '<div class="body">' +
+    '  <span class="section-label">Your Details</span>' +
+    '  <div class="edit-card">' +
+    '    <div class="form-row">' +
+    '      <div class="form-group">' +
+    '        <label class="form-label" for="editName">Name</label>' +
+    '        <input class="form-input" id="editName" type="text" placeholder="Your name">' +
+    '      </div>' +
+    '      <div class="form-group">' +
+    '        <label class="form-label" for="editEmail">Email</label>' +
+    '        <input class="form-input" id="editEmail" type="email" placeholder="Your email">' +
+    '      </div>' +
+    '    </div>' +
+    '    <div class="form-actions">' +
+    '      <button class="btn-save" id="saveBtn">Save Changes</button>' +
+    '      <span class="save-msg" id="saveMsg" role="status">✓ Saved!</span>' +
+    '    </div>' +
+    '  </div>' +
+    '  <span class="section-label">Recently Viewed</span>' +
+    '  <h2 class="section-title">Stylists you\'ve <em>explored</em></h2>' +
+    (recentStylists.length ? '<div class="recent-grid">' + recentHtml + '</div>' : recentHtml) +
+    '  <div class="danger-zone">' +
+    '    <span class="danger-label">Want to sign out?</span>' +
+    '    <button class="btn-logout" id="logoutBtn">Sign Out</button>' +
+    '  </div>' +
+    '</div>';
 
-    <div class="body">
+  // Populate values safely via DOM (not template)
+  var heroFirst = document.getElementById('heroFirstName');
+  if (heroFirst) heroFirst.textContent = name.split(' ')[0] || 'there';
+  var nameInput = document.getElementById('editName');
+  var emailInput = document.getElementById('editEmail');
+  if (nameInput) nameInput.value = name;
+  if (emailInput) emailInput.value = email;
 
-      <!-- Edit profile -->
-      <span class="section-label">Your Details</span>
-      <div class="edit-card">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Name</label>
-            <input class="form-input" id="editName" type="text" value="${name}" placeholder="Your name">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input class="form-input" id="editEmail" type="email" value="${email}" placeholder="Your email">
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-save" onclick="saveChanges()">Save Changes</button>
-          <span class="save-msg" id="saveMsg">✓ Saved!</span>
-        </div>
-      </div>
-
-      <!-- Recently viewed -->
-      <span class="section-label">Recently Viewed</span>
-      <h2 class="section-title">Stylists you've <em>explored</em></h2>
-      ${recentStylists.length ? `<div class="recent-grid">${recentHtml}</div>` : recentHtml}
-
-      <!-- Logout -->
-      <div class="danger-zone">
-        <span class="danger-label">Want to sign out?</span>
-        <button class="btn-logout" onclick="BM.logout()">Sign Out</button>
-      </div>
-
-    </div>
-  `;
+  // Wire event listeners
+  var saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveChanges);
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() { BM.logout(); });
 }
 
-function saveChanges(){
-  const name = document.getElementById('editName').value.trim();
-  const email = document.getElementById('editEmail').value.trim();
-  if(!name||!email) return;
+function saveChanges() {
+  var name = document.getElementById('editName').value.trim();
+  var email = document.getElementById('editEmail').value.trim();
+  if (!name || !email) return;
   BM.login(name, email);
-  // Update hero name instantly
-  const heroName = document.querySelector('.hero-name');
-  if(heroName) {
-    heroName.innerHTML = 'Hey, <em></em>';
-    heroName.querySelector('em').textContent = name.split(' ')[0];
-  }
+
+  // Update hero instantly
+  var heroFirst = document.getElementById('heroFirstName');
+  if (heroFirst) heroFirst.textContent = name.split(' ')[0];
+
   BM.renderNav();
-  // Set form values safely (avoids value injection in template)
-  const nameInput = document.getElementById('editName');
-  const emailInput = document.getElementById('editEmail');
-  if (nameInput) nameInput.value = BM.getUser().name;
-  if (emailInput) emailInput.value = BM.getUser().email;
-  // Populate form values safely
+
+  // Re-set form values safely
   var ni = document.getElementById('editName');
   var ei = document.getElementById('editEmail');
   if (ni) ni.value = BM.getUser().name;
   if (ei) ei.value = BM.getUser().email;
-  const msg = document.getElementById('saveMsg');
-  msg.classList.add('show');
-  setTimeout(()=>msg.classList.remove('show'), 2500);
+
+  var msg = document.getElementById('saveMsg');
+  if (msg) {
+    msg.classList.add('show');
+    setTimeout(function() { msg.classList.remove('show'); }, 2500);
+  }
 }
 
-// Hamburger
-// ── Load data and render ──────────────────────────────────────────────────
-fetch('braidmap_data.json')
-  .then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
+// Load data and render (hardened: timeout + retry + cache via BM.data)
+BM.loadStylists()
   .then(function(data) {
-    STYLISTS   = data.stylists;
+    STYLISTS = data.stylists;
     TAG_LABELS = data.tag_labels;
     BM.renderNav();
     render();
   })
   .catch(function(err) {
-    console.error('BraidMap: failed to load data', err);
+    BM.log.error('member: failed to load data', err);
     BM.renderNav();
     render();
   });

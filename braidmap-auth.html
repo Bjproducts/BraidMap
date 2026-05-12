@@ -4,96 +4,85 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Join BraidMap — Create a free account to browse 121 BIPOC hairstylists across BC.">
+<meta property="og:title" content="Sign Up / Login — BraidMap">
+<meta property="og:description" content="Create a free account to browse 121 BIPOC hairstylists across BC.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
 <title>Sign Up / Login — BraidMap</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/braidmap.css">
 <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/log.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/data.js"></script>
+<script src="js/core/nav.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
-:root{--black:#0A0A0A;--white:#FAFAFA;--g100:#F2F2F2;--g200:#E0E0E0;--g400:#A0A0A0;--g600:#555}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--white);color:var(--black);font-family:'Manrope',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+/* ── Page-specific: Auth ── */
+body { min-height: 100vh; display: flex; flex-direction: column; }
 
+/* Override nav to static (non-fixed) on this page */
+nav { position: static; backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--white); }
 
+.main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 65px); }
 
-/* NAV */
-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--g200);background:var(--white);}
-.logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px;color:var(--black);display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-m{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:14px;font-style:italic;font-family:'Instrument Serif',serif}
-.nav-link{font-size:13px;color:var(--g600);text-decoration:none;transition:color .15s}
-.nav-link:hover{color:var(--black)}
+/* Left branding panel */
+.left-panel { background: var(--black); padding: 80px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.left-panel::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 48px 48px; }
+.left-content { position: relative; }
+.left-eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 24px; display: block; }
+.left-title { font-family: var(--font-serif); font-size: 52px; font-weight: 400; letter-spacing: -2px; line-height: 1.05; color: white; margin-bottom: 20px; }
+.left-title em { font-style: italic; color: rgba(255,255,255,.4); }
+.left-sub { font-size: 14px; color: rgba(255,255,255,.4); line-height: 1.8; font-weight: 300; max-width: 340px; }
+.left-stats { display: flex; gap: 32px; position: relative; }
+.left-stat-num { font-family: var(--font-serif); font-size: 32px; color: white; letter-spacing: -1px; display: block; line-height: 1; }
+.left-stat-label { font-size: 11px; color: rgba(255,255,255,.3); font-family: var(--font-mono); margin-top: 2px; display: block; }
 
-/* MAIN LAYOUT */
-.main{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 65px)}
-
-/* LEFT — branding panel */
-.left-panel{background:var(--black);padding:80px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-.left-panel::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px}
-.left-content{position:relative}
-.left-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:24px;display:block}
-.left-title{font-family:'Instrument Serif',serif;font-size:52px;font-weight:400;letter-spacing:-2px;line-height:1.05;color:white;margin-bottom:20px}
-.left-title em{font-style:italic;color:rgba(255,255,255,.4)}
-.left-sub{font-size:14px;color:rgba(255,255,255,.4);line-height:1.8;font-weight:300;max-width:340px}
-.left-stats{display:flex;gap:32px;position:relative}
-.left-stat-num{font-family:'Instrument Serif',serif;font-size:32px;color:white;letter-spacing:-1px;display:block;line-height:1}
-.left-stat-label{font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;margin-top:2px;display:block}
-
-/* RIGHT — form panel */
-.right-panel{padding:80px;display:flex;align-items:center;justify-content:center}
-.form-box{width:100%;max-width:400px}
+/* Right form panel */
+.right-panel { padding: 80px; display: flex; align-items: center; justify-content: center; }
+.form-box { width: 100%; max-width: 400px; }
 
 /* Tabs */
-.tabs{display:flex;border:1px solid var(--g200);border-radius:8px;overflow:hidden;margin-bottom:36px}
-.tab{flex:1;padding:11px;text-align:center;font-size:13px;font-weight:500;border:none;background:var(--white);color:var(--g400);transition:all .15s;font-family:'Manrope',sans-serif}
-.tab.active{background:var(--black);color:white}
+.tabs { display: flex; border: 1px solid var(--g200); border-radius: 8px; overflow: hidden; margin-bottom: 36px; }
+.tab { flex: 1; padding: 11px; text-align: center; font-size: 13px; font-weight: 500; border: none; background: var(--white); color: var(--g400); transition: all 0.15s; font-family: var(--font-sans); }
+.tab.active { background: var(--black); color: white; }
 
-.form-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;letter-spacing:-1.5px;color:var(--black);margin-bottom:6px}
-.form-title em{font-style:italic;color:var(--g400)}
-.form-sub{font-size:13px;color:var(--g600);margin-bottom:28px;line-height:1.6;font-weight:300}
+.form-title { font-family: var(--font-serif); font-size: 36px; font-weight: 400; letter-spacing: -1.5px; color: var(--black); margin-bottom: 6px; }
+.form-title em { font-style: italic; color: var(--g400); }
+.form-sub { font-size: 13px; color: var(--g600); margin-bottom: 28px; line-height: 1.6; font-weight: 300; }
+.form-group { margin-bottom: 14px; }
+.form-label { color: var(--g400); }
+.form-name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn-submit { width: 100%; margin-top: 8px; }
+.form-note { font-size: 11px; color: var(--g400); text-align: center; margin-top: 14px; line-height: 1.6; }
 
-.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.form-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)}
-.form-input{padding:12px 14px;border:1.5px solid var(--g200);border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border-color .15s}
-.form-input:focus{border-color:var(--black)}
-.form-input::placeholder{color:var(--g400)}
+/* Nav right links (auth page specific) */
+.nav-right-links { display: flex; align-items: center; gap: 24px; }
+.nav-right-links .nav-link { font-size: 13px; color: var(--g600); text-decoration: none; transition: color 0.15s; }
+.nav-right-links .nav-link:hover { color: var(--black); }
 
-.form-name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-.btn-submit{width:100%;padding:13px;background:var(--black);color:white;border:none;border-radius:7px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;transition:opacity .15s;margin-top:8px}
-.btn-submit:hover{opacity:.85}
-
-.form-note{font-size:11px;color:var(--g400);text-align:center;margin-top:14px;line-height:1.6}
-
-.error-msg{font-size:12px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:6px;padding:10px 14px;margin-bottom:14px;display:none}
-.error-msg.show{display:block}
-.success-msg{font-size:13px;color:#27ae60;background:#f0faf4;border:1px solid #b8e8c8;border-radius:6px;padding:12px 14px;margin-bottom:14px;display:none;font-weight:500}
-.success-msg.show{display:block}
-
-/* Divider */
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0}
-.divider-line{flex:1;height:1px;background:var(--g200)}
-.divider-text{font-size:11px;color:var(--g400);font-family:'DM Mono',monospace;white-space:nowrap}
-
-/* Nav hamburger */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--black);border-radius:2px}
-.nav-mobile-menu{display:none;position:fixed;top:65px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--g200);padding:16px 24px 20px;flex-direction:column;gap:4px;z-index:99}
-.nav-mobile-menu.open{display:flex}
-.nav-mobile-menu a{font-size:15px;color:var(--g600);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--g100)}
-.nav-mobile-menu a:last-child{border-bottom:none}
-
-@media(max-width:768px){
-  nav{padding:16px 24px}
-  .nav-right-links{display:none}
-  .nav-hamburger{display:flex}
-  .main{grid-template-columns:1fr;min-height:auto}
-  .left-panel{display:none}
-  .right-panel{padding:40px 24px;align-items:flex-start}
-  .form-box{max-width:100%}
-  .form-name-row{grid-template-columns:1fr}
+@media (max-width: 1024px) {
+  .left-panel { padding: 48px; }
+  .left-title { font-size: 40px; }
+  .right-panel { padding: 48px; }
+}
+@media (max-width: 768px) {
+  .nav-right-links { display: none; }
+  .main { grid-template-columns: 1fr; min-height: auto; }
+  .left-panel { display: none; }
+  .right-panel { padding: 40px 24px; align-items: flex-start; }
+  .form-box { max-width: 100%; }
+  .form-name-row { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
+
+<a href="#signupForm" class="skip-link">Skip to form</a>
+
 <!-- Netlify hidden form -->
 <form name="braidmap-signup" netlify netlify-honeypot="bot-field" hidden>
   <input name="name" type="text">
@@ -101,15 +90,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 </form>
 
 <nav>
-  <a href="index.html" class="logo"><div class="logo-m">B</div>BraidMap</a>
-  <div class="nav-right-links" style="display:flex;align-items:center;gap:24px;">
+  <a href="index.html" class="logo"><div class="logo-mark">B</div>BraidMap</a>
+  <div class="nav-right-links">
     <a href="braidmap-directory.html" class="nav-link">Find a Stylist</a>
     <a href="braidmap-directory.html" class="nav-link">Styles</a>
     <a href="braidmap-directory.html" class="nav-link">Cities</a>
   </div>
   <span id="navRight"></span>
-  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  <div class="nav-mobile-menu" id="mobileMenu">
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  <div class="nav-mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile menu">
     <a href="braidmap-directory.html">Find a Stylist</a>
   </div>
 </nav>
@@ -123,64 +112,55 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
       <p class="left-sub">Join BraidMap to unlock 121 BIPOC hairstylists across British Columbia — filter by style, city, and book directly.</p>
     </div>
     <div class="left-stats">
-      <div>
-        <span class="left-stat-num">121</span>
-        <span class="left-stat-label">Stylists listed</span>
-      </div>
-      <div>
-        <span class="left-stat-num">16</span>
-        <span class="left-stat-label">Cities in BC</span>
-      </div>
-      <div>
-        <span class="left-stat-num">22</span>
-        <span class="left-stat-label">Style tags</span>
-      </div>
+      <div><span class="left-stat-num">121</span><span class="left-stat-label">Stylists listed</span></div>
+      <div><span class="left-stat-num">16</span><span class="left-stat-label">Cities in BC</span></div>
+      <div><span class="left-stat-num">22</span><span class="left-stat-label">Style tags</span></div>
     </div>
   </div>
 
   <!-- RIGHT PANEL -->
   <div class="right-panel">
-    <div class="form-box">
+    <div class="form-box" role="main">
 
       <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab active" id="tabSignup">Sign Up</button>
-        <button class="tab" id="tabLogin">Log In</button>
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tabSignup" role="tab" aria-selected="true" aria-controls="signupForm">Sign Up</button>
+        <button class="tab" id="tabLogin" role="tab" aria-selected="false" aria-controls="loginForm">Log In</button>
       </div>
 
       <!-- Error / Success -->
-      <div class="error-msg" id="errorMsg"></div>
-      <div class="success-msg" id="successMsg"></div>
+      <div class="error-msg" id="errorMsg" role="alert"></div>
+      <div class="success-msg" id="successMsg" role="status"></div>
 
       <!-- SIGNUP FORM -->
-      <div id="signupForm">
+      <div id="signupForm" role="tabpanel" aria-labelledby="tabSignup">
         <h1 class="form-title">Create your<br><em>free account</em></h1>
         <p class="form-sub">Unlock the full directory and track your favourite stylists.</p>
         <div class="form-name-row">
           <div class="form-group">
-            <label class="form-label">First Name</label>
-            <input class="form-input" id="signupFirst" type="text" placeholder="Jane">
+            <label class="form-label" for="signupFirst">First Name</label>
+            <input class="form-input" id="signupFirst" type="text" placeholder="Jane" autocomplete="given-name">
           </div>
           <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <input class="form-input" id="signupLast" type="text" placeholder="Doe">
+            <label class="form-label" for="signupLast">Last Name</label>
+            <input class="form-input" id="signupLast" type="text" placeholder="Doe" autocomplete="family-name">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" id="signupEmail" type="email" placeholder="jane@example.com">
+          <label class="form-label" for="signupEmail">Email</label>
+          <input class="form-input" id="signupEmail" type="email" placeholder="jane@example.com" autocomplete="email">
         </div>
         <button class="btn-submit" id="signupBtn">Create Account →</button>
         <p class="form-note">Free forever. No spam. Unsubscribe anytime.</p>
       </div>
 
       <!-- LOGIN FORM -->
-      <div id="loginForm" style="display:none">
+      <div id="loginForm" role="tabpanel" aria-labelledby="tabLogin" style="display:none">
         <h1 class="form-title">Welcome<br><em>back</em></h1>
         <p class="form-sub">Enter your email to access your BraidMap profile.</p>
         <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" id="loginEmail" type="email" placeholder="jane@example.com">
+          <label class="form-label" for="loginEmail">Email</label>
+          <input class="form-input" id="loginEmail" type="email" placeholder="jane@example.com" autocomplete="email">
         </div>
         <button class="btn-submit" id="loginBtn">Log In →</button>
         <p class="form-note">No password needed — we match your email to your account.</p>
@@ -191,76 +171,74 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 </div>
 
 <script>
-// If already signed in, redirect to member page
-if(BM.isLoggedIn()){ window.location.href='braidmap-member.html'; }
+// If already signed in, redirect
+if (BM.isLoggedIn()) { window.location.href = 'braidmap-member.html'; }
 
-// updateNav -> BM.renderNav
-
-function switchTab(tab){
-  document.getElementById('signupForm').style.display = tab==='signup' ? 'block' : 'none';
-  document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
-  document.getElementById('tabSignup').className = 'tab' + (tab==='signup' ? ' active' : '');
-  document.getElementById('tabLogin').className = 'tab' + (tab==='login' ? ' active' : '');
+function switchTab(tab) {
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  var tabSignup = document.getElementById('tabSignup');
+  var tabLogin = document.getElementById('tabLogin');
+  tabSignup.className = 'tab' + (tab === 'signup' ? ' active' : '');
+  tabLogin.className = 'tab' + (tab === 'login' ? ' active' : '');
+  tabSignup.setAttribute('aria-selected', tab === 'signup' ? 'true' : 'false');
+  tabLogin.setAttribute('aria-selected', tab === 'login' ? 'true' : 'false');
   clearMessages();
 }
 
-function showError(msg){ const el=document.getElementById('errorMsg'); el.textContent=msg; el.classList.add('show'); document.getElementById('successMsg').classList.remove('show'); }
-function showSuccess(msg){ const el=document.getElementById('successMsg'); el.textContent=msg; el.classList.add('show'); document.getElementById('errorMsg').classList.remove('show'); }
-function clearMessages(){ document.getElementById('errorMsg').classList.remove('show'); document.getElementById('successMsg').classList.remove('show'); }
+function showError(msg) { var el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); document.getElementById('successMsg').classList.remove('show'); }
+function showSuccess(msg) { var el = document.getElementById('successMsg'); el.textContent = msg; el.classList.add('show'); document.getElementById('errorMsg').classList.remove('show'); }
+function clearMessages() { document.getElementById('errorMsg').classList.remove('show'); document.getElementById('successMsg').classList.remove('show'); }
 
-function handleSignup(){
-  const first=document.getElementById('signupFirst').value.trim();
-  const last=document.getElementById('signupLast').value.trim();
-  const email=document.getElementById('signupEmail').value.trim();
-  if(!first){ showError('Please enter your first name.'); return; }
-  if(!email || !email.includes('@')){ showError('Please enter a valid email address.'); return; }
-  const name = last ? `${first} ${last}` : first;
-  // Submit to Netlify Forms
-  const fd=new FormData();
-  fd.append('form-name','braidmap-signup');
-  fd.append('name',name);
-  fd.append('email',email);
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
+function handleSignup() {
+  var first = document.getElementById('signupFirst').value.trim();
+  var last = document.getElementById('signupLast').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  if (!first) { showError('Please enter your first name.'); return; }
+  if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return; }
+  var name = last ? first + ' ' + last : first;
+  var fd = new FormData();
+  fd.append('form-name', 'braidmap-signup');
+  fd.append('name', name);
+  fd.append('email', email);
+  fetch('/', { method: 'POST', body: fd }).catch(function() {});
   BM.login(name, email);
-  showSuccess(`Welcome to BraidMap, ${first}! Redirecting...`);
-  setTimeout(()=>{ window.location.href='braidmap-directory.html'; }, 1200);
+  showSuccess('Welcome to BraidMap, ' + first + '! Redirecting...');
+  setTimeout(function() { window.location.href = 'braidmap-directory.html'; }, 1200);
 }
 
-function handleLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  if(!email || !email.includes('@')){ showError('Please enter a valid email address.'); return; }
-  const storedEmail=BM.getUser().email;
-  if(storedEmail && storedEmail.toLowerCase()===email.toLowerCase()){
-    showSuccess(`Welcome back, ${BM.getUser().name.split(' ')[0]}! Redirecting...`);
+function handleLogin() {
+  var email = document.getElementById('loginEmail').value.trim();
+  if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return; }
+  var storedEmail = BM.getUser().email;
+  if (storedEmail && storedEmail.toLowerCase() === email.toLowerCase()) {
+    showSuccess('Welcome back, ' + BM.getUser().name.split(' ')[0] + '! Redirecting...');
     BM.login(BM.getUser().name, storedEmail);
-    setTimeout(()=>{ window.location.href='braidmap-member.html'; }, 1200);
+    setTimeout(function() { window.location.href = 'braidmap-member.html'; }, 1200);
   } else {
-    // Email not found on this device — treat as new signup with just email
     BM.login(email.split('@')[0], email);
     showSuccess('Logged in! Redirecting...');
-    setTimeout(()=>{ window.location.href='braidmap-directory.html'; }, 1200);
+    setTimeout(function() { window.location.href = 'braidmap-directory.html'; }, 1200);
   }
 }
 
-// Wire buttons (replaced onclick with id)
-document.getElementById('tabSignup') && document.getElementById('tabSignup').addEventListener('click', function(){ switchTab('signup'); });
-document.getElementById('tabLogin')  && document.getElementById('tabLogin').addEventListener('click', function(){ switchTab('login'); });
-document.getElementById('signupBtn') && document.getElementById('signupBtn').addEventListener('click', handleSignup);
-document.getElementById('loginBtn')  && document.getElementById('loginBtn').addEventListener('click', handleLogin);
+// Wire buttons
+document.getElementById('tabSignup').addEventListener('click', function() { switchTab('signup'); });
+document.getElementById('tabLogin').addEventListener('click', function() { switchTab('login'); });
+document.getElementById('signupBtn').addEventListener('click', handleSignup);
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
 
 // Enter key support
-document.addEventListener('keydown', e=>{
-  if(e.key==='Enter'){
-    if(document.getElementById('loginForm').style.display!=='none') handleLogin();
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (document.getElementById('loginForm').style.display !== 'none') handleLogin();
     else handleSignup();
   }
 });
 
 // Check URL param for tab
-const params=new URLSearchParams(window.location.search);
-if(params.get('tab')==='login') switchTab('login');
-
-// Hamburger
+var params = new URLSearchParams(window.location.search);
+if (params.get('tab') === 'login') switchTab('login');
 
 BM.renderNav();
 </script>
