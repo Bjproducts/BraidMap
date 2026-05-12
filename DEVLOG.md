@@ -36,7 +36,8 @@ BraidMap-Fresh/
 │   │   ├── utils.js            esc, escAttr, debounce, urlParam, booking helpers
 │   │   ├── auth.js             login, logout, getUser, recents
 │   │   ├── data.js             fetchJson (timeout + retry + cache), loadStylists
-│   │   └── nav.js              renderNav + hamburger wiring
+│   │   ├── nav.js              renderNav + hamburger wiring
+│   │   └── ui.js               toast, button loading, skeleton card factory
 │   └── braidmap.js             Compatibility shim — exposes flat BM.xxx API
 ├── netlify.toml                Security headers + deploy config
 ├── package.json                npm start / npm run dev
@@ -120,6 +121,7 @@ Split the monolithic `js/braidmap.js` into `js/core/*` modules. No build step �
 <script src="js/core/auth.js"></script>
 <script src="js/core/data.js"></script>
 <script src="js/core/nav.js"></script>
+<script src="js/core/ui.js"></script>
 <script src="js/braidmap.js"></script>   <!-- shim exposing flat API -->
 ```
 
@@ -177,6 +179,64 @@ Directory, profile, and member pages all migrated from raw `fetch('braidmap_data
 - `package.json` with `npm start` / `npm run dev` / `npm run serve` scripts
 - `README.md` with: local dev quickstart, project structure, full API reference, hardened-fetch notes, security notes, pre-deploy checklist, troubleshooting
 
+### Phase 9 — MVP Polish ✅
+
+Production UX polish layer. Adds `js/core/ui.js` — small framework-free utilities:
+
+| Helper | Use |
+|--------|-----|
+| `BM.ui.toast(msg, opts)` | Top-right toast with `success` / `error` / `info` variants. Auto-dismiss, ARIA-live. |
+| `BM.ui.setLoading(btn, isLoading)` | Disables button + inline spinner + restores original HTML cleanly |
+| `BM.ui.skeletonGrid(n)` | Returns an HTML string of `n` shimmer skeleton cards for instant perceived load |
+
+Applied to:
+- **Directory**: skeleton cards on initial load (replaces plain spinner). On fetch failure, dashed-border empty state with Retry button + error toast.
+- **Auth**: signup/login buttons enter loading state on submit.
+- **Report / Suggest**: submit buttons enter loading state; success toast on completion.
+- **Member**: Save Changes validates inline via toast (no more silent `if (!name || !email) return`).
+
+CSS additions (sections 15b–15e in `css/braidmap.css`):
+- `.bm-toast-wrap`, `.bm-toast` — toast styling + variants
+- `.bm-spinner`, `button:disabled` — global button-loading affordance
+- `.card--skeleton`, `.sk-*` — shimmer skeleton cards
+- `.empty-state`, `.empty-state-icon/title/sub/cta` — reusable empty state
+
+### Phase 10 — Production Deployment Hardening ✅
+
+**`netlify.toml`** now includes per-path caching:
+
+| Path | Cache-Control |
+|------|---------------|
+| `/*.html` | `public, max-age=0, must-revalidate` (always fresh) |
+| `/css/*`, `/js/*` | `public, max-age=86400, stale-while-revalidate=604800` (1d hot, 7d stale-OK) |
+| `/braidmap_data.json` | `public, max-age=300, stale-while-revalidate=3600` (5m hot, 1h stale-OK) |
+
+Plus `Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()` to silence Lighthouse warnings and disable FLoC.
+
+**Resource hints on every page:**
+- `<link rel="preconnect" href="https://fonts.googleapis.com">`
+- `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+
+**Preload on data-heavy pages** (directory, profile):
+- `<link rel="preload" href="braidmap_data.json" as="fetch" type="application/json" crossorigin="anonymous">`
+
+This means the browser starts fetching the JSON in parallel with the HTML parse — the data is usually ready by the time `BM.loadStylists()` is called.
+
+### Phase 11 — Verification ✅
+
+| Test | Result |
+|------|--------|
+| All 7 HTML pages | 200 |
+| All 9 JS modules | 200 |
+| CSS + JSON | 200 |
+| `BM.ui` present on every page | ✅ |
+| Toast: success / error / info backgrounds | rgb(29,111,74) / rgb(181,48,48) / rgb(10,10,10) ✅ |
+| Button loading: disabled + aria-busy + spinner + restored on toggle off | ✅ |
+| Skeleton grid: 6 cards, `animation-name: shimmer` running | ✅ |
+| Empty state polish (icon + title + sub + dark CTA) | ✅ |
+| Directory: skeleton → real cards (121) on success | ✅ |
+| Compat shim: no-op `BM.ui` fallback if `ui.js` missing | ✅ |
+
 ---
 
 ## Public API — `window.BM`
@@ -213,6 +273,14 @@ Directory, profile, and member pages all migrated from raw `fetch('braidmap_data
 | Method | Description |
 |--------|-------------|
 | `BM.renderNav()` | populate `#navLinks`, `#navRight`, `#mobileMenu` from current auth state |
+
+### UI Polish
+| Method | Description |
+|--------|-------------|
+| `BM.ui.toast(msg, opts)` | top-right notification; `opts.type`: `'info'\|'success'\|'error'`, `opts.duration` (default 3200ms) |
+| `BM.ui.setLoading(btn, isLoading)` | disables button, inline spinner, restores original HTML on toggle off |
+| `BM.ui.skeletonGrid(n)` | returns HTML string of `n` shimmer skeleton cards |
+| `BM.ui.skeletonCardHtml()` | single skeleton card HTML |
 
 ### Storage & Config
 | Method | Description |
@@ -347,5 +415,6 @@ Optional rollup/esbuild step to concatenate `js/core/*.js` into a single `dist/b
 
 | Version | Notes |
 |---------|-------|
-| 1.0.0 | Initial clean commit — shared BM module, dynamic data fetch, XSS-safe, Netlify-ready |
+| 1.0.0 | Initial clean commit — shared BM module, dynamic data fetch, XSS-safe, Netlify-ready n|
 | 1.1.0 | Modular `js/core/` architecture · hardened fetch (timeout/retry/cache) · debounced search · `package.json` + `README.md` · responsive bug fixes · card layout rebuild |
+| 1.2.0 | `js/core/ui.js` (toast, button loading, skeleton) · empty-state polish · Netlify per-path caching · preconnect/preload hints · `Permissions-Policy` header · form submission feedback |

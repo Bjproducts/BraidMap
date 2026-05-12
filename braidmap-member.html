@@ -9,6 +9,8 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
 <title>My Profile — BraidMap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/braidmap.css">
 <script defer data-domain="thebraidmap.com" src="https://plausible.io/js/script.js"></script>
@@ -19,6 +21,7 @@
 <script src="js/core/auth.js"></script>
 <script src="js/core/data.js"></script>
 <script src="js/core/nav.js"></script>
+<script src="js/core/ui.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
 /* ── Page-specific: Member Dashboard ── */
@@ -208,7 +211,8 @@ function render() {
 function saveChanges() {
   var name = document.getElementById('editName').value.trim();
   var email = document.getElementById('editEmail').value.trim();
-  if (!name || !email) return;
+  if (!name) { if (BM.ui) BM.ui.toast('Please enter your name.', { type: 'error' }); return; }
+  if (!email || email.indexOf('@') < 0) { if (BM.ui) BM.ui.toast('Please enter a valid email.', { type: 'error' }); return; }
   BM.login(name, email);
 
   // Update hero instantly
@@ -228,6 +232,7 @@ function saveChanges() {
     msg.classList.add('show');
     setTimeout(function() { msg.classList.remove('show'); }, 2500);
   }
+  if (BM.ui) BM.ui.toast('Profile updated.', { type: 'success' });
 }
 
 // Load data and render (hardened: timeout + retry + cache via BM.data)

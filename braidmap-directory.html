@@ -8,6 +8,9 @@
 <meta property="og:description" content="Browse 121 BIPOC hairstylists across BC. Filter by city, style, and book directly.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>">
+<link rel="preload" href="braidmap_data.json" as="fetch" type="application/json" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <title>Find a Stylist — BraidMap</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/braidmap.css">
@@ -19,6 +22,7 @@
 <script src="js/core/auth.js"></script>
 <script src="js/core/data.js"></script>
 <script src="js/core/nav.js"></script>
+<script src="js/core/ui.js"></script>
 <script src="js/braidmap.js"></script>
 <style>
 /* ── Page-specific: Directory ── */
@@ -211,10 +215,8 @@
         <option value="city">By city</option>
       </select>
     </div>
-    <div id="cardsWrap">
-      <div class="loading-state" aria-live="polite">
-        <span class="loading-state-text">Loading stylists...</span>
-      </div>
+    <div id="cardsWrap" aria-live="polite" aria-busy="true">
+      <!-- Skeleton grid populated by BM.ui on load; replaced with real cards by render() -->
     </div>
   </main>
 </div>
@@ -459,23 +461,37 @@ document.getElementById('mobileFilterBtn').addEventListener('click', function() 
   btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
 
+// Seed skeleton cards immediately (polished perceived loading)
+(function() {
+  var w = document.getElementById('cardsWrap');
+  if (w && BM.ui && BM.ui.skeletonGrid) w.innerHTML = BM.ui.skeletonGrid(9);
+})();
+
 // Load data and initialise (hardened: timeout + retry + cache via BM.data)
 BM.loadStylists()
   .then(function(data) {
     initDirectory(data);
     BM.renderNav();
     render();
+    var w = document.getElementById('cardsWrap');
+    if (w) w.setAttribute('aria-busy', 'false');
   })
   .catch(function(err) {
     BM.log.error('directory: failed to load data', err);
     var w = document.getElementById('cardsWrap');
-    if (w) w.innerHTML = '<div class="no-results">' +
-      '<span class="no-results-icon" aria-hidden="true">⚠️</span>' +
-      '<h3>Unable to load <em>stylists</em></h3>' +
-      '<p>Please refresh the page to try again.</p></div>';
+    if (w) {
+      w.setAttribute('aria-busy', 'false');
+      w.innerHTML = '<div class="empty-state">' +
+        '<span class="empty-state-icon" aria-hidden="true">⚠️</span>' +
+        '<h3 class="empty-state-title">Unable to load stylists</h3>' +
+        '<p class="empty-state-sub">Something went wrong fetching the directory. Check your connection and try again.</p>' +
+        '<button class="empty-state-cta" onclick="window.location.reload()">↻ Retry</button>' +
+        '</div>';
+    }
     var fs = document.getElementById('filterStatus');
     if (fs) fs.textContent = 'Error loading data';
     BM.renderNav();
+    if (BM.ui) BM.ui.toast('Could not load stylists. Please try again.', { type: 'error', duration: 4000 });
   });
 </script>
 </body>

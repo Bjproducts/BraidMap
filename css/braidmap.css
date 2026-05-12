@@ -840,6 +840,122 @@ footer {
 .mb-xl { margin-bottom: var(--sp-xl); }
 
 
+/* ── 15b. Toast Notifications ─────────────────────────────────────────── */
+.bm-toast-wrap {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: calc(100vw - 48px);
+}
+.bm-toast {
+  pointer-events: auto;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  background: var(--black);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.08);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  max-width: 360px;
+  line-height: 1.5;
+}
+.bm-toast.show { opacity: 1; transform: translateY(0); }
+.bm-toast--success { background: #1d6f4a; }
+.bm-toast--error   { background: #b53030; }
+@media (max-width: 768px) {
+  .bm-toast-wrap { top: 16px; right: 16px; left: 16px; max-width: none; }
+  .bm-toast { max-width: none; }
+}
+
+
+/* ── 15c. Button Loading State ────────────────────────────────────────── */
+button:disabled,
+.btn-primary:disabled,
+.btn-submit:disabled,
+.btn-save:disabled,
+.btn-book:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.bm-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+.is-loading .bm-btn-text { opacity: 0.85; }
+
+
+/* ── 15d. Skeleton Card ───────────────────────────────────────────────── */
+.card--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+.card--skeleton:hover { transform: none; border-color: var(--g200); }
+.sk-av    { width: 40px; height: 40px; border-radius: var(--radius-md); }
+.sk-badge { width: 70px; height: 18px; border-radius: 3px; }
+.sk-line  { height: 14px; border-radius: 3px; margin-top: 10px; }
+.sk-line--name   { width: 65%; height: 18px; }
+.sk-line--handle { width: 45%; height: 11px; margin-top: 6px; }
+.sk-line--short  { width: 50%; height: 14px; margin-top: 0; }
+.sk-tags  { display: flex; gap: 4px; margin-top: 12px; }
+.sk-tag   { width: 50px; height: 18px; border-radius: 3px; }
+.sk-btn   { width: 64px; height: 24px; border-radius: 4px; }
+
+
+/* ── 15e. Empty States ────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--g200);
+  border-radius: var(--radius-lg);
+}
+.empty-state-icon { font-size: 36px; margin-bottom: 12px; display: block; opacity: 0.5; }
+.empty-state-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--black);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.empty-state-sub {
+  font-size: 13px;
+  color: var(--g600);
+  line-height: 1.7;
+  max-width: 360px;
+  margin: 0 auto 18px;
+  font-weight: 300;
+}
+.empty-state-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--black);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity var(--ease-fast);
+}
+.empty-state-cta:hover { opacity: 0.85; }
+
+
 /* ── 16. Responsive — Tablet (1024px) ─────────────────────────────────── */
 @media (max-width: 1024px) {
   nav { padding: 18px 32px; }

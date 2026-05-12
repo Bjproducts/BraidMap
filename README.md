@@ -45,7 +45,8 @@ BraidMap-Fresh/
 │   │   ├── utils.js            esc, escAttr, URL helpers, debounce
 │   │   ├── auth.js             login, logout, getUser, recents
 │   │   ├── data.js             Hardened fetchJson + loadStylists
-│   │   └── nav.js              renderNav (desktop + mobile)
+│   │   ├── nav.js              renderNav (desktop + mobile)
+│   │   └── ui.js               toast, button loading state, skeleton cards
 │   └── braidmap.js             Compatibility shim — exposes flat BM.xxx API
 ├── netlify.toml                Security headers + deploy config
 ├── DEVLOG.md                   Development log
@@ -64,6 +65,7 @@ Every HTML page loads the core modules in dependency order:
 <script src="js/core/auth.js"></script>
 <script src="js/core/data.js"></script>
 <script src="js/core/nav.js"></script>
+<script src="js/core/ui.js"></script>
 <script src="js/braidmap.js"></script>
 ```
 

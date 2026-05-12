@@ -52,5 +52,15 @@
   BM.fetchJson    = BM.data.fetchJson;
   BM.loadStylists = BM.data.loadStylists;
 
+  // BM.ui is optional (only present if ui.js was loaded). No-op fallbacks if not.
+  if (!BM.ui) {
+    BM.ui = {
+      toast:           function () {},
+      setLoading:      function () {},
+      skeletonCardHtml: function () { return ''; },
+      skeletonGrid:    function () { return ''; }
+    };
+  }
+
   BM.log.info('BraidMap', BM.config.version, 'ready.');
 }(window));
