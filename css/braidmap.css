@@ -671,9 +671,9 @@ select.modal-input {
 .lock-wrap { position: relative; }
 .lock-fade {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 220px;
-  background: linear-gradient(to bottom, transparent, white);
+  bottom: 0; left: 0; right: 0;
+  height: 300px;
+  background: linear-gradient(to top, white 20%, transparent);
   pointer-events: none;
   z-index: 5;
 }
@@ -826,6 +826,59 @@ footer {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--g400);
+}
+
+
+/* ── 14b. Locked Cards (non-logged-in paywall) ───────────────────────── */
+.card--locked {
+  position: relative;
+  cursor: pointer;
+}
+.card--locked .card-body,
+.card--locked .card-footer {
+  filter: blur(5px);
+  opacity: 0.45;
+  user-select: none;
+  pointer-events: none;
+}
+.card--locked::after {
+  content: 'Sign up to view';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  background: rgba(250, 250, 250, 0.4);
+  border-radius: var(--radius-lg);
+  z-index: 2;
+  letter-spacing: 0.2px;
+}
+.card--locked:hover { border-color: var(--black); transform: translateY(-2px); }
+.card--locked:hover::after { background: rgba(250, 250, 250, 0.55); }
+
+
+/* ── 14c. Gate / Modal Cancel Button ─────────────────────────────────── */
+.gate-cancel,
+.modal-cancel-btn {
+  width: 100%;
+  padding: 11px;
+  background: none;
+  color: var(--g400);
+  border: 1.5px solid var(--g200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color var(--ease-fast), color var(--ease-fast);
+  margin-top: 6px;
+}
+.gate-cancel:hover,
+.modal-cancel-btn:hover {
+  border-color: var(--black);
+  color: var(--black);
 }
 
 

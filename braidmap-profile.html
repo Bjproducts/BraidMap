@@ -162,6 +162,7 @@
       <input class="gate-input" id="gateName" name="name" type="text" placeholder="Your name" required autocomplete="name">
       <input class="gate-input" id="gateEmail" name="email" type="email" placeholder="Your email address" required autocomplete="email">
       <button class="gate-submit" type="submit">Sign Up Free →</button>
+      <button class="gate-cancel" type="button" id="gateCancelBtn">← Back to directory</button>
     </form>
     <p class="gate-note">Free forever. No spam.<br>Already have an account? <a href="braidmap-auth.html?tab=login">Log in here</a></p>
   </div>
@@ -210,6 +211,7 @@
         <textarea class="modal-input" id="claim_message" placeholder="Any additional info to help us verify..."></textarea>
       </div>
       <button class="modal-submit" id="claimSubmitBtn">Submit Claim →</button>
+      <button class="modal-cancel-btn" type="button" id="claimCancelBtn">Cancel</button>
     </div>
     <div class="modal-success" id="claimSuccess" style="display:none">
       <span class="modal-success-icon" aria-hidden="true">✅</span>
@@ -254,6 +256,7 @@
         <textarea class="modal-input" id="report_details" placeholder="Tell us more about the issue..."></textarea>
       </div>
       <button class="modal-submit" id="reportSubmitBtn">Submit Report →</button>
+      <button class="modal-cancel-btn" type="button" id="reportCancelBtn">Cancel</button>
     </div>
     <div class="modal-success" id="reportSuccess" style="display:none">
       <span class="modal-success-icon" aria-hidden="true">✅</span>
@@ -267,8 +270,8 @@
 var STYLISTS = [], TAG_LABELS = {};
 var currentStylist = null;
 
-function showGate() { document.getElementById('gateOverlay').classList.add('show'); }
-function hideGate() { document.getElementById('gateOverlay').classList.remove('show'); }
+function showGate() { document.getElementById('gateOverlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
+function hideGate() { document.getElementById('gateOverlay').classList.remove('show'); document.body.style.overflow = ''; }
 
 document.getElementById('gateForm').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -284,6 +287,16 @@ document.getElementById('gateForm').addEventListener('submit', function(e) {
   hideGate();
   BM.renderNav();
   render();
+});
+
+// Gate cancel → go back to directory
+document.getElementById('gateCancelBtn').addEventListener('click', function() {
+  window.location.href = 'braidmap-directory.html';
+});
+
+// Gate overlay click dismiss
+document.getElementById('gateOverlay').addEventListener('click', function(e) {
+  if (e.target === this) window.location.href = 'braidmap-directory.html';
 });
 
 function ini(n) { return (n.replace(/[^a-zA-Z]/g, '')[0] || 'B').toUpperCase(); }
@@ -457,12 +470,15 @@ document.getElementById('claimModal').addEventListener('click', function(e) { if
 document.getElementById('reportModal').addEventListener('click', function(e) { if (e.target === this) closeModal('report'); });
 document.getElementById('claimModalClose').addEventListener('click', function() { closeModal('claim'); });
 document.getElementById('reportModalClose').addEventListener('click', function() { closeModal('report'); });
+document.getElementById('claimCancelBtn').addEventListener('click', function() { closeModal('claim'); });
+document.getElementById('reportCancelBtn').addEventListener('click', function() { closeModal('report'); });
 
-// Close on Escape
+// Close on Escape (modals and gate)
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeModal('claim');
     closeModal('report');
+    hideGate();
   }
 });
 
@@ -515,6 +531,8 @@ BM.loadStylists()
     TAG_LABELS = data.tag_labels;
     BM.renderNav();
     render();
+    // Auto-show gate for unauthenticated visitors — profile pages are members-only
+    if (!BM.isLoggedIn()) { showGate(); }
   })
   .catch(function(err) {
     BM.log.error('profile: failed to load data', err);

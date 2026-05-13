@@ -90,7 +90,8 @@
 .stylist-card {
   border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
   padding: 18px 20px; display: flex; align-items: flex-start; gap: 14px;
-  transition: all 0.2s; background: rgba(255,255,255,0.03);
+  transition: all 0.2s; background: rgba(255,255,255,0.03); cursor: pointer;
+  text-decoration: none; color: inherit;
 }
 .stylist-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); transform: translateX(4px); }
 .s-avatar {
@@ -258,6 +259,7 @@
       <input class="gate-input" id="gateName" name="name" type="text" placeholder="Your name" required autocomplete="name">
       <input class="gate-input" id="gateEmail" name="email" type="email" placeholder="Your email address" required autocomplete="email">
       <button class="gate-submit" type="submit">Unlock Full Directory →</button>
+      <button class="gate-cancel" type="button" id="gateCancelBtn">Cancel</button>
     </form>
     <p class="gate-note">Free forever. No spam. Unsubscribe anytime.<br>Already have an account? <a href="braidmap-auth.html?tab=login" style="color:var(--black);font-weight:600;text-decoration:underline;">Log in here</a></p>
   </div>
@@ -309,12 +311,12 @@
       <div class="stat"><span class="stat-num">22</span><span class="stat-label">Style tags</span></div>
     </div>
   </div>
-  <div class="hero-right" aria-hidden="true">
+  <div class="hero-right">
     <p class="hero-right-label">Featured stylists</p>
     <div class="stylist-cards">
-      <div class="stylist-card"><div class="s-avatar">M</div><div class="s-info"><div class="s-name">Mou Jam Beauty</div><div class="s-loc">📍 Surrey, BC</div><div class="s-tags"><span class="s-tag">Knotless</span><span class="s-tag">Locs</span><span class="s-tag">Sew-In</span><span class="s-tag">Men's</span></div></div><div class="s-count">13</div></div>
-      <div class="stylist-card"><div class="s-avatar">H</div><div class="s-info"><div class="s-name">Hakuna Matata Salon</div><div class="s-loc">📍 Victoria, BC</div><div class="s-tags"><span class="s-tag">Box Braids</span><span class="s-tag">Twists</span><span class="s-tag">Silk Press</span></div></div><div class="s-count">14</div></div>
-      <div class="stylist-card"><div class="s-avatar">D</div><div class="s-info"><div class="s-name">DES Curl Spa</div><div class="s-loc">📍 Vancouver, BC</div><div class="s-tags"><span class="s-tag">Curly Cuts</span><span class="s-tag">K-Tips</span><span class="s-tag">Locs</span></div></div><div class="s-count">14</div></div>
+      <div class="stylist-card" data-href="braidmap-profile.html?id=BM-0088" role="link" tabindex="0"><div class="s-avatar">M</div><div class="s-info"><div class="s-name">Mou Jam Beauty</div><div class="s-loc">📍 Surrey, BC</div><div class="s-tags"><span class="s-tag">Knotless</span><span class="s-tag">Locs</span><span class="s-tag">Sew-In</span><span class="s-tag">Men's</span></div></div><div class="s-count">13</div></div>
+      <div class="stylist-card" data-href="braidmap-profile.html?id=BM-0121" role="link" tabindex="0"><div class="s-avatar">H</div><div class="s-info"><div class="s-name">Hakuna Matata Salon</div><div class="s-loc">📍 Victoria, BC</div><div class="s-tags"><span class="s-tag">Box Braids</span><span class="s-tag">Twists</span><span class="s-tag">Silk Press</span></div></div><div class="s-count">14</div></div>
+      <div class="stylist-card" data-href="braidmap-profile.html?id=BM-0114" role="link" tabindex="0"><div class="s-avatar">D</div><div class="s-info"><div class="s-name">DES Curl Spa</div><div class="s-loc">📍 Vancouver, BC</div><div class="s-tags"><span class="s-tag">Curly Cuts</span><span class="s-tag">K-Tips</span><span class="s-tag">Locs</span></div></div><div class="s-count">14</div></div>
     </div>
     <div class="hero-map-hint">
       <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
@@ -566,6 +568,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var dismissBtn = document.getElementById('gateDismiss');
   if (dismissBtn) dismissBtn.addEventListener('click', hideGate);
 
+  var cancelBtn = document.getElementById('gateCancelBtn');
+  if (cancelBtn) cancelBtn.addEventListener('click', hideGate);
+
   // Close gate on overlay click
   var overlay = document.getElementById('gateOverlay');
   if (overlay) {
@@ -577,6 +582,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Close gate on Escape
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') hideGate();
+  });
+
+  // Hero featured card navigation
+  document.querySelectorAll('.stylist-card[data-href]').forEach(function(card) {
+    card.addEventListener('click', function() {
+      window.location.href = card.dataset.href;
+    });
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        window.location.href = card.dataset.href;
+      }
+    });
   });
 
   // Show gate after delay if not signed up
